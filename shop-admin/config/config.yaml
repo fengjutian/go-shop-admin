@@ -1,0 +1,5 @@
+server:
+  port: 8080
+
+ database:
+  dsn: "root:password@tcp(localhost:3306)/shop_admin?charset=utf8mb4&parseTime=True&loc=Local"
