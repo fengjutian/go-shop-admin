@@ -1,8 +1,11 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
 	"os"
+	"path/filepath"
+	"runtime"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Config 配置结构体
@@ -23,7 +26,12 @@ type DatabaseConfig struct {
 
 // LoadConfig 加载配置
 func LoadConfig() (*Config, error) {
-	file, err := os.ReadFile("config/config.yaml")
+	// 获取项目根目录
+	_, b, _, _ := runtime.Caller(0)
+	rootPath := filepath.Dir(filepath.Dir(b))
+	configPath := filepath.Join(rootPath, "config", "config.yaml")
+
+	file, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
