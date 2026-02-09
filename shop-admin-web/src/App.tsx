@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 import './components/Sidebar.css'
 import Dashboard from './pages/Dashboard'
@@ -11,32 +11,9 @@ import Settings from './pages/Settings'
 
 // 主内容组件，包含路由和页面切换
 const MainContent: React.FC<{ sidebarCollapsed: boolean }> = ({ sidebarCollapsed }) => {
-  const location = useLocation()
-  
-  // 根据当前路由获取页面标题
-  const getPageTitle = () => {
-    const path = location.pathname
-    switch (path) {
-      case '/dashboard':
-        return '仪表盘'
-      case '/shops':
-        return '店铺管理'
-      case '/products':
-        return '商品管理'
-      case '/reviews':
-        return '评价管理'
-      case '/users':
-        return '用户管理'
-      case '/settings':
-        return '系统设置'
-      default:
-        return '仪表盘'
-    }
-  }
-
   return (
     <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <header className="main-header">
+      {/* <header className="main-header">
         <div className="header-title">
           <h1>{getPageTitle()}</h1>
         </div>
@@ -48,7 +25,7 @@ const MainContent: React.FC<{ sidebarCollapsed: boolean }> = ({ sidebarCollapsed
             <span>➕</span> 新增
           </button>
         </div>
-      </header>
+      </header> */}
       <div className="content-container">
         <Routes>
           <Route path="/" element={<Dashboard />} />
