@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"shop-admin/internal/model"
+
+	"gorm.io/gorm"
 )
 
 // ShopRepository 店铺仓库接口

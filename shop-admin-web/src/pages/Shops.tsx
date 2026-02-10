@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { shopApi } from '../services/api';
 
+type TypeList = 'retail' | 'restaurant' | 'service' | 'other';
+
 interface Shop {
-  id: number;
+  id?: string | number;
   name: string;
-  address: string;
-  phone: string;
-  status: string;
+  email: string;
+  address?: string;
+  type?: TypeList;
+  contact?: string;
+  rating?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  otherInfo?: string | null;
+  imageBase64?: string | null;
+  description?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Shops: React.FC = () => {
@@ -16,22 +27,28 @@ const Shops: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentShop, setCurrentShop] = useState<Shop>({
-    id: 0,
     name: '',
+    email: '',
     address: '',
-    phone: '',
-    status: 'active'
+    type: 'retail',
+    contact: '',
+    rating: null,
+    latitude: null,
+    longitude: null,
+    otherInfo: null,
+    imageBase64: null,
+    description: null
   });
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   // 获取店铺列表
   const fetchShops = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await shopApi.getShops();
-      setShops(response.data);
+      const shopsData = await shopApi.getShops();
+      setShops(shopsData.data);
     } catch (err) {
       setError('获取店铺列表失败');
       console.error('Error fetching shops:', err);
@@ -52,11 +69,17 @@ const Shops: React.FC = () => {
       setIsAddModalOpen(false);
       // 重置表单
       setCurrentShop({
-        id: 0,
         name: '',
+        email: '',
         address: '',
-        phone: '',
-        status: 'active'
+        type: 'retail',
+        contact: '',
+        rating: null,
+        latitude: null,
+        longitude: null,
+        otherInfo: null,
+        imageBase64: null,
+        description: null
       });
       // 重新获取列表
       fetchShops();
@@ -69,7 +92,8 @@ const Shops: React.FC = () => {
   // 处理编辑店铺
   const handleEditShop = async () => {
     try {
-      await shopApi.updateShop(currentShop.id, currentShop);
+      const shopId = typeof currentShop.id === 'string' ? parseInt(currentShop.id) : currentShop.id;
+      await shopApi.updateShop(shopId, currentShop);
       setIsEditModalOpen(false);
       // 重新获取列表
       fetchShops();
@@ -80,10 +104,11 @@ const Shops: React.FC = () => {
   };
 
   // 处理删除店铺
-  const handleDeleteShop = async (id: number) => {
+  const handleDeleteShop = async (id: number | string) => {
     if (window.confirm('确定要删除这个店铺吗？')) {
       try {
-        await shopApi.deleteShop(id);
+        const shopId = typeof id === 'string' ? parseInt(id) : id;
+        await shopApi.deleteShop(shopId);
         // 重新获取列表
         fetchShops();
       } catch (err) {
@@ -102,8 +127,8 @@ const Shops: React.FC = () => {
   // 过滤店铺列表
   const filteredShops = shops.filter(shop => {
     const matchesSearch = shop.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || shop.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesType = typeFilter === 'all' || shop.type === typeFilter;
+    return matchesSearch && matchesType;
   });
 
   return (
@@ -130,12 +155,14 @@ const Shops: React.FC = () => {
         </div>
         <div className="filter-box">
           <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
           >
-            <option value="all">全部状态</option>
-            <option value="active">营业中</option>
-            <option value="inactive">已关闭</option>
+            <option value="all">全部类型</option>
+            <option value="retail">零售</option>
+            <option value="restaurant">餐饮</option>
+            <option value="service">服务</option>
+            <option value="other">其他</option>
           </select>
         </div>
       </div>
@@ -155,9 +182,11 @@ const Shops: React.FC = () => {
               <tr>
                 <th>ID</th>
                 <th>店铺名称</th>
+                <th>邮箱</th>
                 <th>地址</th>
-                <th>联系电话</th>
-                <th>状态</th>
+                <th>类型</th>
+                <th>联系人</th>
+                <th>评分</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -166,13 +195,17 @@ const Shops: React.FC = () => {
                 <tr key={shop.id}>
                   <td>{shop.id}</td>
                   <td>{shop.name}</td>
+                  <td>{shop.email}</td>
                   <td>{shop.address}</td>
-                  <td>{shop.phone}</td>
                   <td>
-                    <span className={`status ${shop.status === 'active' ? 'success' : 'warning'}`}>
-                      {shop.status === 'active' ? '营业中' : '已关闭'}
+                    <span className={`status ${shop.type ? 'success' : 'warning'}`}>
+                      {shop.type === 'retail' ? '零售' : 
+                       shop.type === 'restaurant' ? '餐饮' : 
+                       shop.type === 'service' ? '服务' : '其他'}
                     </span>
                   </td>
+                  <td>{shop.contact}</td>
+                  <td>{shop.rating || '-'}</td>
                   <td>
                     <div className="action-buttons">
                       <button 
@@ -224,6 +257,16 @@ const Shops: React.FC = () => {
                   type="text" 
                   value={currentShop.name}
                   onChange={(e) => setCurrentShop({...currentShop, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>邮箱</label>
+                <input 
+                  type="email" 
+                  value={currentShop.email}
+                  onChange={(e) => setCurrentShop({...currentShop, email: e.target.value})}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -235,22 +278,67 @@ const Shops: React.FC = () => {
                 />
               </div>
               <div className="form-group">
-                <label>联系电话</label>
+                <label>类型</label>
+                <select
+                  value={currentShop.type}
+                  onChange={(e) => setCurrentShop({...currentShop, type: e.target.value as TypeList})}
+                >
+                  <option value="retail">零售</option>
+                  <option value="restaurant">餐饮</option>
+                  <option value="service">服务</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>联系人</label>
                 <input 
                   type="text" 
-                  value={currentShop.phone}
-                  onChange={(e) => setCurrentShop({...currentShop, phone: e.target.value})}
+                  value={currentShop.contact}
+                  onChange={(e) => setCurrentShop({...currentShop, contact: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>状态</label>
-                <select
-                  value={currentShop.status}
-                  onChange={(e) => setCurrentShop({...currentShop, status: e.target.value})}
-                >
-                  <option value="active">营业中</option>
-                  <option value="inactive">已关闭</option>
-                </select>
+                <label>评分</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="5" 
+                  step="0.1"
+                  value={currentShop.rating || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, rating: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>纬度</label>
+                <input 
+                  type="number" 
+                  step="0.000001"
+                  value={currentShop.latitude || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, latitude: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>经度</label>
+                <input 
+                  type="number" 
+                  step="0.000001"
+                  value={currentShop.longitude || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, longitude: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>其他信息</label>
+                <textarea 
+                  value={currentShop.otherInfo || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, otherInfo: e.target.value || null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>描述</label>
+                <textarea 
+                  value={currentShop.description || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, description: e.target.value || null})}
+                />
               </div>
             </div>
             <div className="modal-footer">
@@ -291,6 +379,16 @@ const Shops: React.FC = () => {
                   type="text" 
                   value={currentShop.name}
                   onChange={(e) => setCurrentShop({...currentShop, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>邮箱</label>
+                <input 
+                  type="email" 
+                  value={currentShop.email}
+                  onChange={(e) => setCurrentShop({...currentShop, email: e.target.value})}
+                  required
                 />
               </div>
               <div className="form-group">
@@ -302,22 +400,67 @@ const Shops: React.FC = () => {
                 />
               </div>
               <div className="form-group">
-                <label>联系电话</label>
+                <label>类型</label>
+                <select
+                  value={currentShop.type}
+                  onChange={(e) => setCurrentShop({...currentShop, type: e.target.value as TypeList})}
+                >
+                  <option value="retail">零售</option>
+                  <option value="restaurant">餐饮</option>
+                  <option value="service">服务</option>
+                  <option value="other">其他</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>联系人</label>
                 <input 
                   type="text" 
-                  value={currentShop.phone}
-                  onChange={(e) => setCurrentShop({...currentShop, phone: e.target.value})}
+                  value={currentShop.contact}
+                  onChange={(e) => setCurrentShop({...currentShop, contact: e.target.value})}
                 />
               </div>
               <div className="form-group">
-                <label>状态</label>
-                <select
-                  value={currentShop.status}
-                  onChange={(e) => setCurrentShop({...currentShop, status: e.target.value})}
-                >
-                  <option value="active">营业中</option>
-                  <option value="inactive">已关闭</option>
-                </select>
+                <label>评分</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="5" 
+                  step="0.1"
+                  value={currentShop.rating || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, rating: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>纬度</label>
+                <input 
+                  type="number" 
+                  step="0.000001"
+                  value={currentShop.latitude || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, latitude: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>经度</label>
+                <input 
+                  type="number" 
+                  step="0.000001"
+                  value={currentShop.longitude || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, longitude: e.target.value ? parseFloat(e.target.value) : null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>其他信息</label>
+                <textarea 
+                  value={currentShop.otherInfo || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, otherInfo: e.target.value || null})}
+                />
+              </div>
+              <div className="form-group">
+                <label>描述</label>
+                <textarea 
+                  value={currentShop.description || ''}
+                  onChange={(e) => setCurrentShop({...currentShop, description: e.target.value || null})}
+                />
               </div>
             </div>
             <div className="modal-footer">
