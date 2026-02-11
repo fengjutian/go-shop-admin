@@ -35,6 +35,7 @@ func InitMySQL(dsn string) (*gorm.DB, error) {
 		&model.Shop{},
 		&model.Product{},
 		&model.Review{},
+		&model.ShopType{},
 	)
 	if err != nil {
 		return nil, err

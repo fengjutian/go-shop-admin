@@ -47,4 +47,42 @@ export const shopApi = {
   },
 };
 
+// 类型相关 API
+export const typeApi = {
+  // 获取类型列表
+  getTypes: async (page = 1, pageSize = 10) => {
+    const response = await api.get('/types', {
+      params: {
+        page,
+        pageSize
+      }
+    });
+    return response.data;
+  },
+
+  // 获取类型详情
+  getType: async (id: number) => {
+    const response = await api.get(`/types/${id}`);
+    return response.data;
+  },
+
+  // 创建类型
+  createType: async (type: any) => {
+    const response = await api.post('/types', type);
+    return response.data;
+  },
+
+  // 更新类型
+  updateType: async (id: number, type: any) => {
+    const response = await api.put(`/types/${id}`, type);
+    return response.data;
+  },
+
+  // 删除类型
+  deleteType: async (id: number) => {
+    const response = await api.delete(`/types/${id}`);
+    return response.data;
+  },
+};
+
 export default api;

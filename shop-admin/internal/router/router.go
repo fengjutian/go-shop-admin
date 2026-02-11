@@ -250,16 +250,19 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	shopRepo := repository.NewShopRepository(db)
 	productRepo := repository.NewProductRepository(db)
 	reviewRepo := repository.NewReviewRepository(db)
+	typeRepo := repository.NewTypeRepository(db)
 
 	// 初始化服务
 	shopService := service.NewShopService(shopRepo)
 	productService := service.NewProductService(productRepo)
 	reviewService := service.NewReviewService(reviewRepo)
+	typeService := service.NewTypeService(typeRepo)
 
 	// 初始化处理器
 	shopHandler := v1.NewShopHandler(shopService)
 	productHandler := v1.NewProductHandler(productService)
 	reviewHandler := v1.NewReviewHandler(reviewService)
+	typeHandler := v1.NewTypeHandler(typeService)
 
 	// API 路由组
 	api := r.Group("/api/v1")
@@ -294,6 +297,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			reviews.GET("/:id", reviewHandler.Get)
 			reviews.GET("", reviewHandler.List)
 			reviews.GET("/product/:product_id", reviewHandler.ListByProductID)
+		}
+
+		// 类型路由
+		types := api.Group("/types")
+		{
+			types.POST("", typeHandler.Create)
+			types.PUT("/:id", typeHandler.Update)
+			types.DELETE("/:id", typeHandler.Delete)
+			types.GET("/:id", typeHandler.Get)
+			types.GET("", typeHandler.List)
 		}
 	}
 

@@ -4,6 +4,7 @@ import './App.css'
 import './components/Sidebar.css'
 import Dashboard from './pages/Dashboard'
 import Shops from './pages/Shops'
+import Types from './pages/Types'
 import Products from './pages/Products'
 import Reviews from './pages/Reviews'
 import Users from './pages/Users'
@@ -31,6 +32,7 @@ const MainContent: React.FC<{ sidebarCollapsed: boolean }> = ({ sidebarCollapsed
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/shops" element={<Shops />} />
+          <Route path="/types" element={<Types />} />
           <Route path="/products" element={<Products />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/users" element={<Users />} />
@@ -46,6 +48,7 @@ const SidebarWithRoutes: React.FC<{ collapsed: boolean; onToggle: () => void }> 
   const menuItems = [
     { id: 'dashboard', name: '仪表盘', icon: '📊', path: '/dashboard' },
     { id: 'shops', name: '店铺管理', icon: '🏪', path: '/shops' },
+    { id: 'types', name: '类型管理', icon: '📦', path: '/types' },
     { id: 'products', name: '商品管理', icon: '🛍️', path: '/products' },
     { id: 'reviews', name: '评价管理', icon: '⭐', path: '/reviews' },
     { id: 'users', name: '用户管理', icon: '👥', path: '/users' },
