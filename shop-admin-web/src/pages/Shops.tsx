@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button } from '@douyinfe/semi-ui';
+import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Row, Col, Select, Button } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 import MapSelector from '../components/MapSelector';
@@ -470,20 +470,27 @@ const Shops: React.FC = () => {
             max={5}
             step={0.1}
           />
-          <Form.Input
-            field="latitude"
-            label="纬度"
-            type="number"
-            step={0.000001}
-            disabled
-          />
-          <Form.Input
-            field="longitude"
-            label="经度"
-            type="number"
-            step={0.000001}
-            disabled
-          />
+           <Row>
+            <Col span={12}>
+              <Form.Input
+                field="latitude"
+                label="纬度"
+                type="number"
+                step={0.000001}
+                disabled
+              />
+            </Col>
+            <Col span={12}>
+              <Form.Input
+              field="longitude"
+              label="经度"
+              type="number"
+              step={0.000001}
+              disabled
+            />
+            </Col>
+          </Row>
+        
           <Button
             type="primary"
             onClick={() => setIsMapSelectorVisible(true)}
