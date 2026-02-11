@@ -51,10 +51,11 @@ const Shops: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const shopsData = await shopApi.getShops(currentPage, pageSize);
-      setShops(shopsData.data);
-      setTotalItems(shopsData.total || shopsData.data.length);
-      setTotalPages(Math.ceil((shopsData.total || shopsData.data.length) / pageSize));
+      const response = await shopApi.getShops(currentPage, pageSize);
+      const shopsData = response.data;
+      setShops(Array.isArray(shopsData.data) ? shopsData.data : []);
+      setTotalItems(shopsData.total || 0);
+      setTotalPages(Math.ceil((shopsData.total || 0) / pageSize));
     } catch (err) {
       setError('获取店铺列表失败');
       console.error('Error fetching shops:', err);
@@ -63,10 +64,10 @@ const Shops: React.FC = () => {
     }
   };
 
-  // 初始加载
+  // 初始加载和分页参数变化时重新获取数据
   useEffect(() => {
     fetchShops();
-  }, []);
+  }, [currentPage, pageSize]);
 
   // 处理新增店铺
   const handleAddShop = async () => {
