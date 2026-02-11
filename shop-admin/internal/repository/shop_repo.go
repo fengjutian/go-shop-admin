@@ -74,8 +74,8 @@ func (r *shopRepository) ListWithPagination(page, pageSize int) ([]*model.Shop, 
 		return nil, 0, err
 	}
 
-	// 分页查询，按创建时间倒序
-	if err := r.db.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&shops).Error; err != nil {
+	// 分页查询，使用原生SQL确保按ID倒序排序
+	if err := r.db.Raw("SELECT * FROM shops ORDER BY id DESC LIMIT ? OFFSET ?", pageSize, offset).Scan(&shops).Error; err != nil {
 		return nil, 0, err
 	}
 
