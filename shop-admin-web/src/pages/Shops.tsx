@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
+import MapSelector from '../components/MapSelector';
 
 const { Text } = Typography;
 
@@ -51,6 +52,7 @@ const Shops: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [isMapSelectorVisible, setIsMapSelectorVisible] = useState(false);
 
   // 获取店铺列表
   const fetchShops = async () => {
@@ -152,6 +154,16 @@ const Shops: React.FC = () => {
     setCurrentShop(shopCopy);
     // 直接打开Modal
     setIsEditModalOpen(true);
+  };
+
+  // 处理地图选择
+  const handleMapSelect = (latitude: number, longitude: number) => {
+    setCurrentShop({
+      ...currentShop,
+      latitude,
+      longitude,
+    });
+    setIsMapSelectorVisible(false);
   };
 
   // 过滤店铺列表
@@ -379,13 +391,22 @@ const Shops: React.FC = () => {
             label="纬度"
             type="number"
             step={0.000001}
+            disabled
           />
           <Form.Input
             field="longitude"
             label="经度"
             type="number"
             step={0.000001}
+            disabled
           />
+          <Button
+            type="primary"
+            onClick={() => setIsMapSelectorVisible(true)}
+            style={{ marginLeft: '100px', marginTop: '8px' }}
+          >
+            从地图选择位置
+          </Button>
           <Form.TextArea
             field="otherInfo"
             label="其他信息"
@@ -454,13 +475,22 @@ const Shops: React.FC = () => {
             label="纬度"
             type="number"
             step={0.000001}
+            disabled
           />
           <Form.Input
             field="longitude"
             label="经度"
             type="number"
             step={0.000001}
+            disabled
           />
+          <Button
+            type="primary"
+            onClick={() => setIsMapSelectorVisible(true)}
+            style={{ marginLeft: '100px', marginTop: '8px' }}
+          >
+            从地图选择位置
+          </Button>
           <Form.TextArea
             field="otherInfo"
             label="其他信息"
@@ -471,6 +501,15 @@ const Shops: React.FC = () => {
           />
         </Form>
       </Modal>
+
+      {/* 地图选择器模态框 */}
+      <MapSelector
+        visible={isMapSelectorVisible}
+        onCancel={() => setIsMapSelectorVisible(false)}
+        onConfirm={handleMapSelect}
+        initialLatitude={currentShop.latitude || 39.9042}
+        initialLongitude={currentShop.longitude || 116.4074}
+      />
     </div>
   );
 };
