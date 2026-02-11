@@ -43,6 +43,7 @@ const Shops: React.FC = () => {
     imageBase64: null,
     description: null
   });
+  const editShopRef = React.useRef<Shop>(currentShop);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,8 +104,9 @@ const Shops: React.FC = () => {
   // 处理编辑店铺
   const handleEditShop = async () => {
     try {
-      const shopId = typeof currentShop.id === 'string' ? parseInt(currentShop.id) : currentShop.id;
-      await shopApi.updateShop(shopId, currentShop);
+      const shopData = editShopRef.current;
+      const shopId = typeof shopData.id === 'string' ? parseInt(shopData.id) : shopData.id;
+      await shopApi.updateShop(shopId, shopData);
       setIsEditModalOpen(false);
       // 重新获取列表
       fetchShops();
@@ -131,7 +133,11 @@ const Shops: React.FC = () => {
 
   // 打开编辑模态框
   const openEditModal = (shop: Shop) => {
+    // 先更新ref，确保数据立即可用
+    editShopRef.current = shop;
+    // 同时更新state，保持状态同步
     setCurrentShop(shop);
+    // 直接打开Modal
     setIsEditModalOpen(true);
   };
 
@@ -317,32 +323,26 @@ const Shops: React.FC = () => {
         <Form
           labelPosition="left"
           labelWidth="100px"
+          model={currentShop}
+          onValueChange={(model) => setCurrentShop(model as Shop)}
         >
           <Form.Input
             field="name"
             label="店铺名称"
-            value={currentShop.name}
-            onChange={(value) => setCurrentShop({...currentShop, name: value})}
             required
           />
           <Form.Input
             field="email"
             label="邮箱"
-            value={currentShop.email}
-            onChange={(value) => setCurrentShop({...currentShop, email: value})}
             required
           />
           <Form.Input
             field="address"
             label="地址"
-            value={currentShop.address || ''}
-            onChange={(value) => setCurrentShop({...currentShop, address: value})}
           />
           <Form.Select
             field="type"
             label="类型"
-            value={currentShop.type || 'retail'}
-            onChange={(value) => setCurrentShop({...currentShop, type: value as TypeList})}
           >
             <Select.Option value="retail">零售</Select.Option>
             <Select.Option value="restaurant">餐饮</Select.Option>
@@ -352,8 +352,6 @@ const Shops: React.FC = () => {
           <Form.Input
             field="contact"
             label="联系人"
-            value={currentShop.contact || ''}
-            onChange={(value) => setCurrentShop({...currentShop, contact: value})}
           />
           <Form.Input
             field="rating"
@@ -362,36 +360,26 @@ const Shops: React.FC = () => {
             min={0}
             max={5}
             step={0.1}
-            value={currentShop.rating || ''}
-            onChange={(value) => setCurrentShop({...currentShop, rating: value ? parseFloat(value) : null})}
           />
           <Form.Input
             field="latitude"
             label="纬度"
             type="number"
             step={0.000001}
-            value={currentShop.latitude || ''}
-            onChange={(value) => setCurrentShop({...currentShop, latitude: value ? parseFloat(value) : null})}
           />
           <Form.Input
             field="longitude"
             label="经度"
             type="number"
             step={0.000001}
-            value={currentShop.longitude || ''}
-            onChange={(value) => setCurrentShop({...currentShop, longitude: value ? parseFloat(value) : null})}
           />
           <Form.TextArea
             field="otherInfo"
             label="其他信息"
-            value={currentShop.otherInfo || ''}
-            onChange={(value) => setCurrentShop({...currentShop, otherInfo: value || null})}
           />
           <Form.TextArea
             field="description"
             label="描述"
-            value={currentShop.description || ''}
-            onChange={(value) => setCurrentShop({...currentShop, description: value || null})}
           />
         </Form>
       </Modal>
@@ -404,36 +392,35 @@ const Shops: React.FC = () => {
         onOk={handleEditShop}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
+        key={editShopRef.current?.id || 'new'}
       >
         <Form
           labelPosition="left"
           labelWidth="100px"
+          model={editShopRef.current}
+          onValueChange={(model) => {
+            editShopRef.current = model as Shop;
+            setCurrentShop(model as Shop);
+          }}
+          key={editShopRef.current?.id || 'new'}
         >
           <Form.Input
             field="name"
             label="店铺名称"
-            value={currentShop.name}
-            onChange={(value) => setCurrentShop({...currentShop, name: value})}
             required
           />
           <Form.Input
             field="email"
             label="邮箱"
-            value={currentShop.email}
-            onChange={(value) => setCurrentShop({...currentShop, email: value})}
             required
           />
           <Form.Input
             field="address"
             label="地址"
-            value={currentShop.address || ''}
-            onChange={(value) => setCurrentShop({...currentShop, address: value})}
           />
           <Form.Select
             field="type"
             label="类型"
-            value={currentShop.type || 'retail'}
-            onChange={(value) => setCurrentShop({...currentShop, type: value as TypeList})}
           >
             <Select.Option value="retail">零售</Select.Option>
             <Select.Option value="restaurant">餐饮</Select.Option>
@@ -443,8 +430,6 @@ const Shops: React.FC = () => {
           <Form.Input
             field="contact"
             label="联系人"
-            value={currentShop.contact || ''}
-            onChange={(value) => setCurrentShop({...currentShop, contact: value})}
           />
           <Form.Input
             field="rating"
@@ -453,36 +438,26 @@ const Shops: React.FC = () => {
             min={0}
             max={5}
             step={0.1}
-            value={currentShop.rating || ''}
-            onChange={(value) => setCurrentShop({...currentShop, rating: value ? parseFloat(value) : null})}
           />
           <Form.Input
             field="latitude"
             label="纬度"
             type="number"
             step={0.000001}
-            value={currentShop.latitude || ''}
-            onChange={(value) => setCurrentShop({...currentShop, latitude: value ? parseFloat(value) : null})}
           />
           <Form.Input
             field="longitude"
             label="经度"
             type="number"
             step={0.000001}
-            value={currentShop.longitude || ''}
-            onChange={(value) => setCurrentShop({...currentShop, longitude: value ? parseFloat(value) : null})}
           />
           <Form.TextArea
             field="otherInfo"
             label="其他信息"
-            value={currentShop.otherInfo || ''}
-            onChange={(value) => setCurrentShop({...currentShop, otherInfo: value || null})}
           />
           <Form.TextArea
             field="description"
             label="描述"
-            value={currentShop.description || ''}
-            onChange={(value) => setCurrentShop({...currentShop, description: value || null})}
           />
         </Form>
       </Modal>
