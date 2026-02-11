@@ -1,14 +1,31 @@
 package db
 
 import (
+	"log"
+	"os"
+	"shop-admin/internal/model"
+	"time"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"shop-admin/internal/model"
+	"gorm.io/gorm/logger"
 )
 
 // InitMySQL 初始化 MySQL 数据库连接
 func InitMySQL(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// 配置GORM日志
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Debug,
+			Colorful:      true,
+		},
+	)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
 		return nil, err
 	}
