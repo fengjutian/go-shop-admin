@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Table, Tag, Tooltip, Typography } from '@douyinfe/semi-ui';
+import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 
@@ -306,248 +306,186 @@ const Shops: React.FC = () => {
       </div>
 
       {/* 新增店铺模态框 */}
-      {isAddModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>新增店铺</h2>
-              <button 
-                className="close-btn"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>店铺名称</label>
-                <input 
-                  type="text" 
-                  value={currentShop.name}
-                  onChange={(e) => setCurrentShop({...currentShop, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>邮箱</label>
-                <input 
-                  type="email" 
-                  value={currentShop.email}
-                  onChange={(e) => setCurrentShop({...currentShop, email: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>地址</label>
-                <input 
-                  type="text" 
-                  value={currentShop.address}
-                  onChange={(e) => setCurrentShop({...currentShop, address: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>类型</label>
-                <select
-                  value={currentShop.type}
-                  onChange={(e) => setCurrentShop({...currentShop, type: e.target.value as TypeList})}
-                >
-                  <option value="retail">零售</option>
-                  <option value="restaurant">餐饮</option>
-                  <option value="service">服务</option>
-                  <option value="other">其他</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>联系人</label>
-                <input 
-                  type="text" 
-                  value={currentShop.contact}
-                  onChange={(e) => setCurrentShop({...currentShop, contact: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>评分</label>
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="5" 
-                  step="0.1"
-                  value={currentShop.rating || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, rating: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>纬度</label>
-                <input 
-                  type="number" 
-                  step="0.000001"
-                  value={currentShop.latitude || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, latitude: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>经度</label>
-                <input 
-                  type="number" 
-                  step="0.000001"
-                  value={currentShop.longitude || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, longitude: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>其他信息</label>
-                <textarea 
-                  value={currentShop.otherInfo || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, otherInfo: e.target.value || null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>描述</label>
-                <textarea 
-                  value={currentShop.description || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, description: e.target.value || null})}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button 
-                className="btn"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                取消
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleAddShop}
-              >
-                保存
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        title="新增店铺"
+        visible={isAddModalOpen}
+        onCancel={() => setIsAddModalOpen(false)}
+        onOk={handleAddShop}
+        okButtonProps={{ type: 'primary' }}
+        cancelButtonProps={{}}
+      >
+        <Form
+          labelPosition="left"
+          labelWidth="100px"
+        >
+          <Form.Input
+            field="name"
+            label="店铺名称"
+            value={currentShop.name}
+            onChange={(value) => setCurrentShop({...currentShop, name: value})}
+            required
+          />
+          <Form.Input
+            field="email"
+            label="邮箱"
+            value={currentShop.email}
+            onChange={(value) => setCurrentShop({...currentShop, email: value})}
+            required
+          />
+          <Form.Input
+            field="address"
+            label="地址"
+            value={currentShop.address || ''}
+            onChange={(value) => setCurrentShop({...currentShop, address: value})}
+          />
+          <Form.Select
+            field="type"
+            label="类型"
+            value={currentShop.type || 'retail'}
+            onChange={(value) => setCurrentShop({...currentShop, type: value as TypeList})}
+          >
+            <Select.Option value="retail">零售</Select.Option>
+            <Select.Option value="restaurant">餐饮</Select.Option>
+            <Select.Option value="service">服务</Select.Option>
+            <Select.Option value="other">其他</Select.Option>
+          </Form.Select>
+          <Form.Input
+            field="contact"
+            label="联系人"
+            value={currentShop.contact || ''}
+            onChange={(value) => setCurrentShop({...currentShop, contact: value})}
+          />
+          <Form.Input
+            field="rating"
+            label="评分"
+            type="number"
+            min={0}
+            max={5}
+            step={0.1}
+            value={currentShop.rating || ''}
+            onChange={(value) => setCurrentShop({...currentShop, rating: value ? parseFloat(value) : null})}
+          />
+          <Form.Input
+            field="latitude"
+            label="纬度"
+            type="number"
+            step={0.000001}
+            value={currentShop.latitude || ''}
+            onChange={(value) => setCurrentShop({...currentShop, latitude: value ? parseFloat(value) : null})}
+          />
+          <Form.Input
+            field="longitude"
+            label="经度"
+            type="number"
+            step={0.000001}
+            value={currentShop.longitude || ''}
+            onChange={(value) => setCurrentShop({...currentShop, longitude: value ? parseFloat(value) : null})}
+          />
+          <Form.TextArea
+            field="otherInfo"
+            label="其他信息"
+            value={currentShop.otherInfo || ''}
+            onChange={(value) => setCurrentShop({...currentShop, otherInfo: value || null})}
+          />
+          <Form.TextArea
+            field="description"
+            label="描述"
+            value={currentShop.description || ''}
+            onChange={(value) => setCurrentShop({...currentShop, description: value || null})}
+          />
+        </Form>
+      </Modal>
 
       {/* 编辑店铺模态框 */}
-      {isEditModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>编辑店铺</h2>
-              <button 
-                className="close-btn"
-                onClick={() => setIsEditModalOpen(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>店铺名称</label>
-                <input 
-                  type="text" 
-                  value={currentShop.name}
-                  onChange={(e) => setCurrentShop({...currentShop, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>邮箱</label>
-                <input 
-                  type="email" 
-                  value={currentShop.email}
-                  onChange={(e) => setCurrentShop({...currentShop, email: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>地址</label>
-                <input 
-                  type="text" 
-                  value={currentShop.address}
-                  onChange={(e) => setCurrentShop({...currentShop, address: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>类型</label>
-                <select
-                  value={currentShop.type}
-                  onChange={(e) => setCurrentShop({...currentShop, type: e.target.value as TypeList})}
-                >
-                  <option value="retail">零售</option>
-                  <option value="restaurant">餐饮</option>
-                  <option value="service">服务</option>
-                  <option value="other">其他</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>联系人</label>
-                <input 
-                  type="text" 
-                  value={currentShop.contact}
-                  onChange={(e) => setCurrentShop({...currentShop, contact: e.target.value})}
-                />
-              </div>
-              <div className="form-group">
-                <label>评分</label>
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="5" 
-                  step="0.1"
-                  value={currentShop.rating || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, rating: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>纬度</label>
-                <input 
-                  type="number" 
-                  step="0.000001"
-                  value={currentShop.latitude || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, latitude: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>经度</label>
-                <input 
-                  type="number" 
-                  step="0.000001"
-                  value={currentShop.longitude || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, longitude: e.target.value ? parseFloat(e.target.value) : null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>其他信息</label>
-                <textarea 
-                  value={currentShop.otherInfo || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, otherInfo: e.target.value || null})}
-                />
-              </div>
-              <div className="form-group">
-                <label>描述</label>
-                <textarea 
-                  value={currentShop.description || ''}
-                  onChange={(e) => setCurrentShop({...currentShop, description: e.target.value || null})}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button 
-                className="btn"
-                onClick={() => setIsEditModalOpen(false)}
-              >
-                取消
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={handleEditShop}
-              >
-                保存
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        title="编辑店铺"
+        visible={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        onOk={handleEditShop}
+        okButtonProps={{ type: 'primary' }}
+        cancelButtonProps={{}}
+      >
+        <Form
+          labelPosition="left"
+          labelWidth="100px"
+        >
+          <Form.Input
+            field="name"
+            label="店铺名称"
+            value={currentShop.name}
+            onChange={(value) => setCurrentShop({...currentShop, name: value})}
+            required
+          />
+          <Form.Input
+            field="email"
+            label="邮箱"
+            value={currentShop.email}
+            onChange={(value) => setCurrentShop({...currentShop, email: value})}
+            required
+          />
+          <Form.Input
+            field="address"
+            label="地址"
+            value={currentShop.address || ''}
+            onChange={(value) => setCurrentShop({...currentShop, address: value})}
+          />
+          <Form.Select
+            field="type"
+            label="类型"
+            value={currentShop.type || 'retail'}
+            onChange={(value) => setCurrentShop({...currentShop, type: value as TypeList})}
+          >
+            <Select.Option value="retail">零售</Select.Option>
+            <Select.Option value="restaurant">餐饮</Select.Option>
+            <Select.Option value="service">服务</Select.Option>
+            <Select.Option value="other">其他</Select.Option>
+          </Form.Select>
+          <Form.Input
+            field="contact"
+            label="联系人"
+            value={currentShop.contact || ''}
+            onChange={(value) => setCurrentShop({...currentShop, contact: value})}
+          />
+          <Form.Input
+            field="rating"
+            label="评分"
+            type="number"
+            min={0}
+            max={5}
+            step={0.1}
+            value={currentShop.rating || ''}
+            onChange={(value) => setCurrentShop({...currentShop, rating: value ? parseFloat(value) : null})}
+          />
+          <Form.Input
+            field="latitude"
+            label="纬度"
+            type="number"
+            step={0.000001}
+            value={currentShop.latitude || ''}
+            onChange={(value) => setCurrentShop({...currentShop, latitude: value ? parseFloat(value) : null})}
+          />
+          <Form.Input
+            field="longitude"
+            label="经度"
+            type="number"
+            step={0.000001}
+            value={currentShop.longitude || ''}
+            onChange={(value) => setCurrentShop({...currentShop, longitude: value ? parseFloat(value) : null})}
+          />
+          <Form.TextArea
+            field="otherInfo"
+            label="其他信息"
+            value={currentShop.otherInfo || ''}
+            onChange={(value) => setCurrentShop({...currentShop, otherInfo: value || null})}
+          />
+          <Form.TextArea
+            field="description"
+            label="描述"
+            value={currentShop.description || ''}
+            onChange={(value) => setCurrentShop({...currentShop, description: value || null})}
+          />
+        </Form>
+      </Modal>
     </div>
   );
 };
