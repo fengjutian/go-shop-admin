@@ -30,8 +30,8 @@ type Shop struct {
 	ImageBase64 string    `gorm:"column:image_base64;type:text" json:"imageBase64"`
 	Description string    `gorm:"type:text" json:"description"`
 	Phone       string    `gorm:"size:20" json:"phone"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
 // TableName 指定表名
