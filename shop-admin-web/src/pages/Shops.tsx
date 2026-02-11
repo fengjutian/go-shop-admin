@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Pagination } from '@douyinfe/semi-ui';
 import { shopApi } from '../services/api';
 
 type TypeList = 'retail' | 'restaurant' | 'service' | 'other';
@@ -237,29 +238,13 @@ const Shops: React.FC = () => {
       )}
       
       <div className="pagination">
-        <button 
-          className="btn btn-sm" 
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          上一页
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-          <button 
-            key={page}
-            className={`btn btn-sm ${currentPage === page ? 'active' : ''}`}
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </button>
-        ))}
-        <button 
-          className="btn btn-sm" 
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          下一页
-        </button>
+        <Pagination 
+          total={totalItems} 
+          pageSize={pageSize}
+          current={currentPage}
+          onChange={(page) => setCurrentPage(page)}
+          style={{ marginBottom: 12 }}
+        />
         <div className="pagination-info">
           共 {totalItems} 条记录，每页 {pageSize} 条
         </div>
