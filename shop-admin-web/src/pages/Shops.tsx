@@ -189,12 +189,8 @@ const Shops: React.FC = () => {
       ) : (
         <div className="data-table">
           <Table 
-            scroll={{ y: 850 }}
+            scroll={{ y: 450 }}
             columns={[
-              {
-                title: 'ID',
-                dataIndex: 'id',
-              },
               {
                 title: '店铺名称',
                 dataIndex: 'name',
@@ -264,6 +260,7 @@ const Shops: React.FC = () => {
               },
               {
                 title: '操作',
+                width: 200,
                 dataIndex: 'operate',
                 render: (_, record) => (
                   <div className="action-buttons">
