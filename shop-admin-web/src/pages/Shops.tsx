@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Table, Tag } from '@douyinfe/semi-ui';
+import { Pagination, Table, Tag, Tooltip, Typography } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
+
+const { Text } = Typography;
 
 type TypeList = 'retail' | 'restaurant' | 'service' | 'other';
 
@@ -196,15 +198,38 @@ const Shops: React.FC = () => {
               {
                 title: '店铺名称',
                 dataIndex: 'name',
+                width: 100,
+                render: (text) => {
+                  return (
+                    <Text ellipsis={{ showTooltip: true }}>
+                      {text}
+                    </Text>
+                  );
+                },
               },
               {
                 title: '邮箱',
                 dataIndex: 'email',
+                width: 100,
+                render: (text) => {
+                  return (
+                    <Text ellipsis={{ showTooltip: true }}>
+                      {text || '-'}
+                    </Text>
+                  );
+                },
               },
               {
                 title: '地址',
                 dataIndex: 'address',
-                render: (text) => text || '-',
+                width: 100,
+                render: (text) => {
+                  return (
+                    <Text ellipsis={{ showTooltip: true }}>
+                      {text || '-'}
+                    </Text>
+                  );
+                },
               },
               {
                 title: '类型',
@@ -223,7 +248,14 @@ const Shops: React.FC = () => {
               {
                 title: '联系人',
                 dataIndex: 'contact',
-                render: (text) => text || '-',
+                width: 150,
+                render: (text) => {
+                  return (
+                    <Text ellipsis={{ showTooltip: true }}>
+                      {text || '-'}
+                    </Text>
+                  );
+                },
               },
               {
                 title: '评分',
@@ -235,20 +267,24 @@ const Shops: React.FC = () => {
                 dataIndex: 'operate',
                 render: (_, record) => (
                   <div className="action-buttons">
-                    <button 
-                      className="btn btn-sm btn-info"
-                      onClick={() => openEditModal(record)}
-                    >
-                      <IconEdit style={{ marginRight: 4 }} />
-                      编辑
-                    </button>
-                    <button 
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteShop(record.id)}
-                    >
-                      <IconDelete style={{ marginRight: 4 }} />
-                      删除
-                    </button>
+                    <Tooltip content="编辑店铺">
+                      <button 
+                        className="btn btn-sm btn-info"
+                        onClick={() => openEditModal(record)}
+                      >
+                        <IconEdit style={{ marginRight: 4 }} />
+                        编辑
+                      </button>
+                    </Tooltip>
+                    <Tooltip content="删除店铺">
+                      <button 
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteShop(record.id)}
+                      >
+                        <IconDelete style={{ marginRight: 4 }} />
+                        删除
+                      </button>
+                    </Tooltip>
                   </div>
                 ),
               },
