@@ -188,46 +188,8 @@ body {
   max-height: 500px;
 }
 
-.data-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table thead {
-  position: sticky;
-  top: 0;
-  background-color: #f8fafc;
-  z-index: 1;
-}
-
-.data-table tbody {
-  display: block;
-  max-height: 450px;
-  overflow-y: auto;
-}
-
-.data-table thead, .data-table tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-}
-
-.data-table th,
-.data-table td {
-  padding: 16px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.data-table th {
-  background-color: #f8fafc;
-  font-weight: 600;
-  color: #475569;
-  font-size: 14px;
-}
-
-.data-table tr:hover {
-  background-color: #f8fafc;
+.data-table .semi-table {
+  height: 100%;
 }
 
 .data-table .action-buttons {

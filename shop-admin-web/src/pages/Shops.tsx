@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination } from '@douyinfe/semi-ui';
+import { Pagination, Table, Tag } from '@douyinfe/semi-ui';
+import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 
 type TypeList = 'retail' | 'restaurant' | 'service' | 'other';
@@ -185,55 +186,76 @@ const Shops: React.FC = () => {
         <div className="loading">加载中...</div>
       ) : (
         <div className="data-table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>店铺名称</th>
-                <th>邮箱</th>
-                <th>地址</th>
-                <th>类型</th>
-                <th>联系人</th>
-                <th>评分</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredShops.map((shop) => (
-                <tr key={shop.id}>
-                  <td>{shop.id}</td>
-                  <td>{shop.name}</td>
-                  <td>{shop.email}</td>
-                  <td>{shop.address}</td>
-                  <td>
-                    <span className={`status ${shop.type ? 'success' : 'warning'}`}>
-                      {shop.type === 'retail' ? '零售' : 
-                       shop.type === 'restaurant' ? '餐饮' : 
-                       shop.type === 'service' ? '服务' : '其他'}
-                    </span>
-                  </td>
-                  <td>{shop.contact}</td>
-                  <td>{shop.rating || '-'}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button 
-                        className="btn btn-sm btn-info"
-                        onClick={() => openEditModal(shop)}
-                      >
-                        编辑
-                      </button>
-                      <button 
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteShop(shop.id)}
-                      >
-                        删除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table 
+            scroll={{ y: 850 }}
+            columns={[
+              {
+                title: 'ID',
+                dataIndex: 'id',
+              },
+              {
+                title: '店铺名称',
+                dataIndex: 'name',
+              },
+              {
+                title: '邮箱',
+                dataIndex: 'email',
+              },
+              {
+                title: '地址',
+                dataIndex: 'address',
+                render: (text) => text || '-',
+              },
+              {
+                title: '类型',
+                dataIndex: 'type',
+                render: (text) => {
+                  const typeConfig = {
+                    retail: { color: 'blue', text: '零售' },
+                    restaurant: { color: 'green', text: '餐饮' },
+                    service: { color: 'orange', text: '服务' },
+                    other: { color: 'purple', text: '其他' },
+                  };
+                  const typeProps = typeConfig[text] || { color: 'grey', text: '其他' };
+                  return <Tag {...typeProps}>{typeProps.text}</Tag>;
+                },
+              },
+              {
+                title: '联系人',
+                dataIndex: 'contact',
+                render: (text) => text || '-',
+              },
+              {
+                title: '评分',
+                dataIndex: 'rating',
+                render: (text) => text || '-',
+              },
+              {
+                title: '操作',
+                dataIndex: 'operate',
+                render: (_, record) => (
+                  <div className="action-buttons">
+                    <button 
+                      className="btn btn-sm btn-info"
+                      onClick={() => openEditModal(record)}
+                    >
+                      <IconEdit style={{ marginRight: 4 }} />
+                      编辑
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDeleteShop(record.id)}
+                    >
+                      <IconDelete style={{ marginRight: 4 }} />
+                      删除
+                    </button>
+                  </div>
+                ),
+              },
+            ]} 
+            dataSource={filteredShops.map(shop => ({ ...shop, key: shop.id }))} 
+            pagination={false} 
+          />
         </div>
       )}
       
