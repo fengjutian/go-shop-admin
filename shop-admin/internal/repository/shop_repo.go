@@ -13,6 +13,7 @@ type ShopRepository interface {
 	Delete(id uint) error
 	GetByID(id uint) (*model.Shop, error)
 	List() ([]*model.Shop, error)
+	ListWithPagination(page, pageSize int) ([]*model.Shop, int64, error)
 }
 
 // shopRepository 店铺仓库实现
@@ -58,4 +59,25 @@ func (r *shopRepository) List() ([]*model.Shop, error) {
 		return nil, err
 	}
 	return shops, nil
+}
+
+// ListWithPagination 分页获取店铺列表
+func (r *shopRepository) ListWithPagination(page, pageSize int) ([]*model.Shop, int64, error) {
+	var shops []*model.Shop
+	var total int64
+
+	// 计算偏移量
+	offset := (page - 1) * pageSize
+
+	// 获取总记录数
+	if err := r.db.Model(&model.Shop{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	if err := r.db.Offset(offset).Limit(pageSize).Find(&shops).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return shops, total, nil
 }

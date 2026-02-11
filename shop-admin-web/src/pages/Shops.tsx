@@ -41,14 +41,20 @@ const Shops: React.FC = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   // 获取店铺列表
   const fetchShops = async () => {
     setLoading(true);
     setError(null);
     try {
-      const shopsData = await shopApi.getShops();
+      const shopsData = await shopApi.getShops(currentPage, pageSize);
       setShops(shopsData.data);
+      setTotalItems(shopsData.total || shopsData.data.length);
+      setTotalPages(Math.ceil((shopsData.total || shopsData.data.length) / pageSize));
     } catch (err) {
       setError('获取店铺列表失败');
       console.error('Error fetching shops:', err);
@@ -230,11 +236,32 @@ const Shops: React.FC = () => {
       )}
       
       <div className="pagination">
-        <button className="btn btn-sm">上一页</button>
-        <button className="btn btn-sm active">1</button>
-        <button className="btn btn-sm">2</button>
-        <button className="btn btn-sm">3</button>
-        <button className="btn btn-sm">下一页</button>
+        <button 
+          className="btn btn-sm" 
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          上一页
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <button 
+            key={page}
+            className={`btn btn-sm ${currentPage === page ? 'active' : ''}`}
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </button>
+        ))}
+        <button 
+          className="btn btn-sm" 
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          下一页
+        </button>
+        <div className="pagination-info">
+          共 {totalItems} 条记录，每页 {pageSize} 条
+        </div>
       </div>
 
       {/* 新增店铺模态框 */}

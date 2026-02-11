@@ -12,6 +12,7 @@ type ShopService interface {
 	DeleteShop(id uint) error
 	GetShopByID(id uint) (*model.Shop, error)
 	ListShops() ([]*model.Shop, error)
+	ListShopsWithPagination(page, pageSize int) ([]*model.Shop, int64, error)
 }
 
 // shopService 店铺服务实现
@@ -47,4 +48,9 @@ func (s *shopService) GetShopByID(id uint) (*model.Shop, error) {
 // ListShops 获取店铺列表
 func (s *shopService) ListShops() ([]*model.Shop, error) {
 	return s.repo.List()
+}
+
+// ListShopsWithPagination 分页获取店铺列表
+func (s *shopService) ListShopsWithPagination(page, pageSize int) ([]*model.Shop, int64, error) {
+	return s.repo.ListWithPagination(page, pageSize)
 }

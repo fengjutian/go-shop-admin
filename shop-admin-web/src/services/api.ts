@@ -12,8 +12,13 @@ const api = axios.create({
 // 店铺相关 API
 export const shopApi = {
   // 获取店铺列表
-  getShops: async () => {
-    const response = await api.get('/shops');
+  getShops: async (page = 1, pageSize = 10) => {
+    const response = await api.get('/shops', {
+      params: {
+        page,
+        pageSize
+      }
+    });
     return response.data;
   },
 

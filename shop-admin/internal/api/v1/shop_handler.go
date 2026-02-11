@@ -94,11 +94,27 @@ func (h *ShopHandler) Get(c *gin.Context) {
 
 // List 获取店铺列表
 func (h *ShopHandler) List(c *gin.Context) {
-	shops, err := h.service.ListShops()
+	// 获取分页参数
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	
+	// 确保分页参数有效
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+	
+	shops, total, err := h.service.ListShopsWithPagination(page, pageSize)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "获取店铺列表失败", err)
 		return
 	}
 
-	response.Success(c, "获取店铺列表成功", shops)
+	// 返回包含分页信息的响应
+	response.Success(c, "获取店铺列表成功", gin.H{
+		"data":  shops,
+		"total": total,
+	})
 }
