@@ -26,9 +26,10 @@ type Shop struct {
 	Rating      *float64  `json:"rating"`
 	Latitude    *float64  `json:"latitude"`
 	Longitude   *float64  `json:"longitude"`
-	OtherInfo   string    `gorm:"type:text" json:"otherInfo"`
-	ImageBase64 string    `gorm:"type:text" json:"imageBase64"`
+	OtherInfo   string    `gorm:"column:other_info;type:text" json:"otherInfo"`
+	ImageBase64 string    `gorm:"column:image_base64;type:text" json:"imageBase64"`
 	Description string    `gorm:"type:text" json:"description"`
+	Phone       string    `gorm:"size:20" json:"phone"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
