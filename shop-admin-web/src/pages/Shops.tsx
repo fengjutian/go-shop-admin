@@ -104,7 +104,21 @@ const Shops: React.FC = () => {
   const handleEditShop = async () => {
     try {
       const shopId = typeof currentShop.id === 'string' ? parseInt(currentShop.id) : currentShop.id;
-      await shopApi.updateShop(shopId, currentShop);
+      // 创建一个新对象，移除不需要的字段，并处理可能为null的字段
+      const { id, created_at, updated_at, ...shopData } = currentShop;
+      
+      // 处理可能为null的字段
+      const processedShopData = {
+        ...shopData,
+        imageBase64: shopData.imageBase64 || '',
+        otherInfo: shopData.otherInfo || '',
+        description: shopData.description || '',
+        rating: shopData.rating === null ? undefined : shopData.rating,
+        latitude: shopData.latitude === null ? undefined : shopData.latitude,
+        longitude: shopData.longitude === null ? undefined : shopData.longitude,
+      };
+      
+      await shopApi.updateShop(shopId, processedShopData);
       setIsEditModalOpen(false);
       // 重新获取列表
       fetchShops();
