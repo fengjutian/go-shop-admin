@@ -18,7 +18,7 @@ func InitMySQL(dsn string) (*gorm.DB, error) {
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
 			SlowThreshold: time.Second,
-			LogLevel:      logger.Debug,
+			LogLevel:      logger.Info,
 			Colorful:      true,
 		},
 	)

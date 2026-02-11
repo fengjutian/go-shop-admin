@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button, Rating, Row, Col } from '@douyinfe/semi-ui';
-import Message from '@douyinfe/semi-ui/message';
+import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button, Rating, Row, Col, Toast } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 import MapSelector from '../components/MapSelector';
@@ -80,9 +79,14 @@ const Shops: React.FC = () => {
 
   // 处理新增店铺
   const handleAddShop = async () => {
+    if (!currentShop.name) {
+      Toast.warning('店铺名称不能为空');
+      return;
+    }
 
     try {
       await shopApi.createShop(currentShop);
+      alert('店铺添加成功');
       // 重置表单
       setCurrentShop({
         name: '',
@@ -102,11 +106,12 @@ const Shops: React.FC = () => {
       // 重新获取列表
       fetchShops();
     } catch (err) {
+      console.log(err);
       // 处理店铺名称已存在的错误
-      if (err.response?.data?.error === 'shop name already exists') {
-        Message.warning('店铺名称已存在，请使用其他名称');
+      if (err.response?.data?.data === 'shop name already exists') {
+        alert('店铺名称已存在，请使用其他名称');
       } else {
-        Message.error('创建店铺失败');
+        alert('创建店铺失败');
         console.error('Error adding shop:', err);
       }
     }
