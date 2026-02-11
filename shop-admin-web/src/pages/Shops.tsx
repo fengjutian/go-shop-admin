@@ -321,8 +321,8 @@ const Shops: React.FC = () => {
         <Form
           labelPosition="left"
           labelWidth="100px"
-          model={currentShop}
-          onValueChange={(model) => setCurrentShop(model as Shop)}
+          initValues={currentShop}
+          onValueChange={(values) => setCurrentShop(values as Shop)}
         >
           <Form.Input
             field="name"
@@ -395,10 +395,8 @@ const Shops: React.FC = () => {
         <Form
           labelPosition="left"
           labelWidth="100px"
-          model={currentShop}
-          onValueChange={(model) => {
-            setCurrentShop(model as Shop);
-          }}
+          initValues={currentShop}
+          onValueChange={(values) => setCurrentShop(values as Shop)}
           key={currentShop?.id || 'new'}
         >
           <Form.Input
