@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Row, Col, Select, Button } from '@douyinfe/semi-ui';
+import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button, Rating, Row, Col } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 import MapSelector from '../components/MapSelector';
@@ -273,7 +273,7 @@ const Shops: React.FC = () => {
                 },
               },
               {
-                title: '联系人',
+                title: '联系方式',
                 dataIndex: 'contact',
                 width: 150,
                 render: (text) => {
@@ -376,30 +376,35 @@ const Shops: React.FC = () => {
           </Form.Select>
           <Form.Input
             field="contact"
-            label="联系人"
+            label="联系方式"
           />
-          <Form.Input
-            field="rating"
-            label="评分"
-            type="number"
-            min={0}
-            max={5}
-            step={0.1}
-          />
-          <Form.Input
-            field="latitude"
-            label="纬度"
-            type="number"
-            step={0.000001}
-            disabled
-          />
-          <Form.Input
-            field="longitude"
-            label="经度"
-            type="number"
-            step={0.000001}
-            disabled
-          />
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'inline-block', width: '100px', marginBottom: 8 }}>评分</label>
+            <Rating 
+              value={currentShop.rating || 0} 
+              onChange={(value) => setCurrentShop({ ...currentShop, rating: value })} 
+            />
+          </div>
+          <Row>
+            <Col span={12}>
+              <Form.Input
+                field="latitude"
+                label="纬度"
+                type="number"
+                step={0.000001}
+                disabled
+              />
+            </Col>
+            <Col span={12}>
+              <Form.Input
+                field="longitude"
+                label="经度"
+                type="number"
+                step={0.000001}
+                disabled
+              />
+            </Col>
+          </Row>
           <Button
             type="primary"
             onClick={() => setIsMapSelectorVisible(true)}
@@ -427,6 +432,7 @@ const Shops: React.FC = () => {
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
         key={currentShop?.id || 'new'}
+        width={800}
       >
         <Form
           labelPosition="left"
@@ -460,16 +466,15 @@ const Shops: React.FC = () => {
           </Form.Select>
           <Form.Input
             field="contact"
-            label="联系人"
+            label="联系方式"
           />
-          <Form.Input
-            field="rating"
-            label="评分"
-            type="number"
-            min={0}
-            max={5}
-            step={0.1}
-          />
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'inline-block', width: '100px', marginBottom: 8 }}>评分</label>
+            <Rating 
+              value={currentShop.rating || 0} 
+              onChange={(value) => setCurrentShop({ ...currentShop, rating: value })} 
+            />
+          </div>
            <Row>
             <Col span={12}>
               <Form.Input
