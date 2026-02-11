@@ -185,11 +185,31 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 24px;
+  max-height: 500px;
 }
 
 .data-table table {
   width: 100%;
   border-collapse: collapse;
+}
+
+.data-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f8fafc;
+  z-index: 1;
+}
+
+.data-table tbody {
+  display: block;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.data-table thead, .data-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .data-table th,
