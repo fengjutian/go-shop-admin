@@ -20,6 +20,7 @@ interface Shop {
   otherInfo?: string | null;
   imageBase64?: string | null;
   description?: string | null;
+  phone?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -41,7 +42,8 @@ const Shops: React.FC = () => {
     longitude: null,
     otherInfo: null,
     imageBase64: null,
-    description: null
+    description: null,
+    phone: null
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -104,18 +106,17 @@ const Shops: React.FC = () => {
   const handleEditShop = async () => {
     try {
       const shopId = typeof currentShop.id === 'string' ? parseInt(currentShop.id) : currentShop.id;
-      // 创建一个新对象，移除不需要的字段，并处理可能为null的字段
-      const { id, created_at, updated_at, ...shopData } = currentShop;
       
       // 处理可能为null的字段
       const processedShopData = {
-        ...shopData,
-        imageBase64: shopData.imageBase64 || '',
-        otherInfo: shopData.otherInfo || '',
-        description: shopData.description || '',
-        rating: shopData.rating === null ? undefined : shopData.rating,
-        latitude: shopData.latitude === null ? undefined : shopData.latitude,
-        longitude: shopData.longitude === null ? undefined : shopData.longitude,
+        ...currentShop,
+        imageBase64: currentShop.imageBase64 || '',
+        otherInfo: currentShop.otherInfo || '',
+        description: currentShop.description || '',
+        phone: currentShop.phone || '',
+        rating: currentShop.rating === null ? undefined : currentShop.rating,
+        latitude: currentShop.latitude === null ? undefined : currentShop.latitude,
+        longitude: currentShop.longitude === null ? undefined : currentShop.longitude,
       };
       
       await shopApi.updateShop(shopId, processedShopData);
