@@ -81,7 +81,6 @@ const Shops: React.FC = () => {
   const handleAddShop = async () => {
     try {
       await shopApi.createShop(currentShop);
-      setIsAddModalOpen(false);
       // 重置表单
       setCurrentShop({
         name: '',
@@ -94,8 +93,10 @@ const Shops: React.FC = () => {
         longitude: null,
         otherInfo: null,
         imageBase64: null,
-        description: null
+        description: null,
+        phone: null
       });
+      setIsAddModalOpen(false);
       // 重新获取列表
       fetchShops();
     } catch (err) {
