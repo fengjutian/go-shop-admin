@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button, Rating, Row, Col } from '@douyinfe/semi-ui';
+import Message from '@douyinfe/semi-ui/message';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
 import { shopApi } from '../services/api';
 import MapSelector from '../components/MapSelector';
@@ -79,6 +80,7 @@ const Shops: React.FC = () => {
 
   // 处理新增店铺
   const handleAddShop = async () => {
+
     try {
       await shopApi.createShop(currentShop);
       // 重置表单
@@ -100,8 +102,13 @@ const Shops: React.FC = () => {
       // 重新获取列表
       fetchShops();
     } catch (err) {
-      setError('创建店铺失败');
-      console.error('Error adding shop:', err);
+      // 处理店铺名称已存在的错误
+      if (err.response?.data?.error === 'shop name already exists') {
+        Message.warning('店铺名称已存在，请使用其他名称');
+      } else {
+        Message.error('创建店铺失败');
+        console.error('Error adding shop:', err);
+      }
     }
   };
 
@@ -345,6 +352,7 @@ const Shops: React.FC = () => {
         onOk={handleAddShop}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
+        width={800}
       >
         <Form
           labelPosition="left"

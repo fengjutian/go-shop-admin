@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"shop-admin/internal/model"
 
 	"gorm.io/gorm"
@@ -28,6 +29,14 @@ func NewShopRepository(db *gorm.DB) ShopRepository {
 
 // Create 创建店铺
 func (r *shopRepository) Create(shop *model.Shop) error {
+	// 检查店铺名称是否已存在
+	var existingShop model.Shop
+	if err := r.db.Where("name = ?", shop.Name).First(&existingShop).Error; err == nil {
+		// 店铺名称已存在
+		return errors.New("shop name already exists")
+	}
+
+	// 店铺名称不存在，创建店铺
 	return r.db.Create(shop).Error
 }
 

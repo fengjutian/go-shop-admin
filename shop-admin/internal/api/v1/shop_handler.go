@@ -29,6 +29,10 @@ func (h *ShopHandler) Create(c *gin.Context) {
 	}
 
 	if err := h.service.CreateShop(&shop); err != nil {
+		if err.Error() == "shop name already exists" {
+			response.Error(c, http.StatusBadRequest, "店铺名称已存在", err)
+			return
+		}
 		response.Error(c, http.StatusInternalServerError, "创建店铺失败", err)
 		return
 	}
