@@ -43,7 +43,6 @@ const Shops: React.FC = () => {
     imageBase64: null,
     description: null
   });
-  const editShopRef = React.useRef<Shop>(currentShop);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -104,9 +103,8 @@ const Shops: React.FC = () => {
   // 处理编辑店铺
   const handleEditShop = async () => {
     try {
-      const shopData = editShopRef.current;
-      const shopId = typeof shopData.id === 'string' ? parseInt(shopData.id) : shopData.id;
-      await shopApi.updateShop(shopId, shopData);
+      const shopId = typeof currentShop.id === 'string' ? parseInt(currentShop.id) : currentShop.id;
+      await shopApi.updateShop(shopId, currentShop);
       setIsEditModalOpen(false);
       // 重新获取列表
       fetchShops();
@@ -133,10 +131,10 @@ const Shops: React.FC = () => {
 
   // 打开编辑模态框
   const openEditModal = (shop: Shop) => {
-    // 先更新ref，确保数据立即可用
-    editShopRef.current = shop;
-    // 同时更新state，保持状态同步
-    setCurrentShop(shop);
+    // 创建shop对象的深拷贝，避免引用问题
+    const shopCopy = JSON.parse(JSON.stringify(shop));
+    // 更新state
+    setCurrentShop(shopCopy);
     // 直接打开Modal
     setIsEditModalOpen(true);
   };
@@ -392,17 +390,16 @@ const Shops: React.FC = () => {
         onOk={handleEditShop}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
-        key={editShopRef.current?.id || 'new'}
+        key={currentShop?.id || 'new'}
       >
         <Form
           labelPosition="left"
           labelWidth="100px"
-          model={editShopRef.current}
+          model={currentShop}
           onValueChange={(model) => {
-            editShopRef.current = model as Shop;
             setCurrentShop(model as Shop);
           }}
-          key={editShopRef.current?.id || 'new'}
+          key={currentShop?.id || 'new'}
         >
           <Form.Input
             field="name"
