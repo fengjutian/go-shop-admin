@@ -105,20 +105,7 @@ const Shops: React.FC = () => {
       await shopApi.createShop(currentShop);
       alert('店铺添加成功');
       // 重置表单
-      setCurrentShop({
-        name: '',
-        email: '',
-        address: '',
-        type: 'retail',
-        contact: '',
-        rating: null,
-        latitude: null,
-        longitude: null,
-        otherInfo: null,
-        imageBase64: null,
-        description: null,
-        phone: null
-      });
+      resetShopForm();
       setIsAddModalOpen(false);
       // 重新获取列表
       fetchShops();
@@ -196,6 +183,24 @@ const Shops: React.FC = () => {
     setIsMapSelectorVisible(false);
   };
 
+  // 重置店铺表单数据
+  const resetShopForm = () => {
+    setCurrentShop({
+      name: '',
+      email: '',
+      address: '',
+      type: typeList.length > 0 ? typeList[0].value : '',
+      contact: '',
+      rating: null,
+      latitude: null,
+      longitude: null,
+      otherInfo: null,
+      imageBase64: null,
+      description: null,
+      phone: null
+    });
+  };
+
   // 过滤店铺列表
   const filteredShops = shops.filter(shop => {
     const matchesSearch = shop.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -209,7 +214,11 @@ const Shops: React.FC = () => {
         <h1>店铺管理</h1>
         <button 
           className="btn btn-primary"
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={() => {
+            // 重置表单数据
+            resetShopForm();
+            setIsAddModalOpen(true);
+          }}
         >
           <span>➕</span> 新增店铺
         </button>
