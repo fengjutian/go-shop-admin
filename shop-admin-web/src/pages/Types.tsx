@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Tag, Tooltip, Pagination } from '@douyinfe/semi-ui';
+import { Table, Button, Modal, Form, Tag, Tooltip, Pagination } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete, IconPlus } from '@douyinfe/semi-icons';
 import { typeApi } from '../services/api';
 
