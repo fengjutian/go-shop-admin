@@ -197,13 +197,69 @@ const Map: React.FC = () => {
         
         if (shop.latitude && shop.longitude) {
           try {
+            // 打印店铺类型信息
+            console.log(`店铺类型: ${shop.type}`);
+            
+            // 根据店铺类型选择标记颜色
+            const getMarkerColor = (type: string | undefined) => {
+              if (!type) {
+                console.log('店铺类型为空，使用默认蓝色');
+                return 'b'; // 默认蓝色
+              }
+              
+              // 定义类型颜色映射
+              const typeColorMap: Record<string, string> = {
+                '中餐': 'r', // 红色
+                '西餐': 'g', // 绿色
+                '购物': 'b', // 蓝色
+                '娱乐': 'y', // 黄色
+                '酒店': 'g', // 绿色
+                '景点': 'p', // 紫色
+                '医疗': 'c', // 青色
+                '教育': 'o', // 橙色
+                '餐厅': 'r', // 红色（别名）
+                '饭店': 'r', // 红色（别名）
+                '商场': 'b', // 蓝色（别名）
+                '超市': 'b', // 蓝色（别名）
+                '影院': 'y', // 黄色（别名）
+                'KTV': 'y', // 黄色（别名）
+                '宾馆': 'g', // 绿色（别名）
+                '公园': 'p', // 紫色（别名）
+                '景区': 'p', // 紫色（别名）
+                '医院': 'c', // 青色（别名）
+                '诊所': 'c', // 青色（别名）
+                '学校': 'o', // 橙色（别名）
+                '幼儿园': 'o', // 橙色（别名）
+              };
+              
+              // 尝试直接匹配
+              if (typeColorMap[type]) {
+                console.log(`匹配到店铺类型: ${type}，使用颜色: ${typeColorMap[type]}`);
+                return typeColorMap[type];
+              }
+              
+              // 尝试模糊匹配
+              for (const [key, color] of Object.entries(typeColorMap)) {
+                if (type.includes(key)) {
+                  console.log(`模糊匹配到店铺类型: ${type} 包含 ${key}，使用颜色: ${color}`);
+                  return color;
+                }
+              }
+              
+              console.log(`未匹配到店铺类型: ${type}，使用默认蓝色`);
+              return 'b'; // 默认蓝色
+            };
+            
+            const markerColor = getMarkerColor(shop.type);
+            console.log(`最终选择的标记颜色: ${markerColor}`);
+            
             // 创建标记
             const marker = new AMap.Marker({
               position: [shop.longitude, shop.latitude],
               title: shop.name,
               icon: new AMap.Icon({
                 size: new AMap.Size(32, 32),
-                image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+                image: `https://webapi.amap.com/theme/v1.3/markers/n/mark_${markerColor}.png`,
                 imageSize: new AMap.Size(32, 32),
               }),
             });
