@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Tag, Tooltip,Toast , Pagination } from '@douyinfe/semi-ui';
+import { Table, Button, Modal, Form, Tag, Tooltip, Pagination } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete, IconPlus } from '@douyinfe/semi-icons';
 import { typeApi } from '../services/api';
+import { Message } from '@arco-design/web-react';
 
 interface Type {
   id?: string | number;
@@ -41,14 +42,14 @@ const Types: React.FC = () => {
   // 新增类型
   const handleAddType = async () => {
     if (!currentType.name) {
-      Toast.error('类型名称不能为空');
+      Message.warning('类型名称不能为空');
       return;
     }
 
     try {
       await typeApi.createType(currentType);
       // alert('类型添加成功');
-      Toast.success('类型添加成功');
+      Message.success('类型添加成功');
 
       // 重置表单数据
       setCurrentType({ name: '', description: '' });
@@ -56,7 +57,7 @@ const Types: React.FC = () => {
       // 重新获取类型列表
       fetchTypes();
     } catch (error) {
-      alert('类型添加失败');
+      Message.error('类型添加失败');
       console.error('Error adding type:', error);
     }
   };
