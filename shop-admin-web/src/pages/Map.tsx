@@ -258,9 +258,9 @@ const Map: React.FC = () => {
               position: [shop.longitude, shop.latitude],
               title: shop.name,
               icon: new AMap.Icon({
-                size: new AMap.Size(32, 32),
+                size: new AMap.Size(15, 15),
                 image: `https://webapi.amap.com/theme/v1.3/markers/n/mark_${markerColor}.png`,
-                imageSize: new AMap.Size(32, 32),
+                imageSize: new AMap.Size(15, 15),
               }),
             });
 
@@ -368,7 +368,7 @@ const Map: React.FC = () => {
           ref={mapRef} 
           style={{ 
             width: '100%', 
-            height: '650px', 
+            height: '550px', 
             position: 'relative',
             overflow: 'hidden'
           }}

@@ -99,7 +99,7 @@ const MapSelector: React.FC<MapSelectorProps> = ({
       onCancel={onCancel}
       onOk={handleConfirm}
       okButtonProps={{ type: 'primary' }}
-      width={800}
+      width={900}
       height={600}
     >
       <div style={{ height: '400px', width: '100%' }} ref={mapRef} />
