@@ -55,7 +55,7 @@ const Map: React.FC = () => {
         return;
       }
       
-      const shopsList = Array.isArray(shopsData.data) ? shopsData.data : [];
+      const shopsList = Array.isArray(shopsData.data.data) ? shopsData.data.data : [];
       console.log('处理后的店铺列表:', shopsList);
       console.log('店铺数量:', shopsList.length);
       
