@@ -478,7 +478,6 @@ const Shops: React.FC = () => {
         onOk={handleEditShop}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
-        key={currentShop?.id || 'new'}
         width={800}
       >
         <Form
@@ -486,7 +485,6 @@ const Shops: React.FC = () => {
           labelWidth="100px"
           initValues={currentShop}
           onValueChange={(values) => setCurrentShop(values as Shop)}
-          key={currentShop?.id || 'new'}
         >
           <Form.Input
             field="name"

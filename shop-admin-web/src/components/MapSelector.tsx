@@ -14,8 +14,8 @@ const MapSelector: React.FC<MapSelectorProps> = ({
   visible,
   onCancel,
   onConfirm,
-  initialLatitude = 39.9042,
-  initialLongitude = 116.4074,
+  initialLatitude = 31.961087,
+  initialLongitude = 118.881044,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
