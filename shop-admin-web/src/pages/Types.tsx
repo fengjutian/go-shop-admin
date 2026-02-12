@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Tag, Tooltip, Pagination } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete, IconPlus } from '@douyinfe/semi-icons';
+import { Message } from '@arco-design/web-react'
 import { typeApi } from '../services/api';
-import { Message } from '@arco-design/web-react';
 
 interface Type {
   id?: string | number;
@@ -56,8 +56,13 @@ const Types: React.FC = () => {
       setIsAddModalOpen(false);
       // 重新获取类型列表
       fetchTypes();
-    } catch (error) {
-      Message.error('类型添加失败');
+    } catch (error: any) {
+      // 解析错误信息
+      if (error.response?.data?.data === 'type name already exists') {
+        Message.error(error.response.data.message || '类型名称已存在');
+      } else {
+        Message.error('类型添加失败');
+      }
       console.error('Error adding type:', error);
     }
   };
@@ -65,18 +70,25 @@ const Types: React.FC = () => {
   // 编辑类型
   const handleEditType = async () => {
     if (!currentType.name) {
-      alert('类型名称不能为空');
+      Message.warning('类型名称不能为空');
       return;
     }
 
     try {
       await typeApi.updateType(currentType.id as number, currentType);
-      alert('类型更新成功');
+      Message.success('类型更新成功');
       setIsEditModalOpen(false);
       // 重新获取类型列表
       fetchTypes();
-    } catch (error) {
-      alert('类型更新失败');
+    } catch (error: any) {
+      // 解析错误信息
+      if (error.response?.data?.data === 'type name already exists') {
+        Message.error(error.response.data.message || '类型名称已存在');
+      } else if (error.response?.data?.data === 'type not found') {
+        Message.error(error.response.data.message || '类型不存在');
+      } else {
+        Message.error('类型更新失败');
+      }
       console.error('Error updating type:', error);
     }
   };
@@ -86,11 +98,16 @@ const Types: React.FC = () => {
     if (window.confirm('确定要删除这个类型吗？')) {
       try {
         await typeApi.deleteType(id);
-        alert('类型删除成功');
+        Message.success('类型删除成功');
         // 重新获取类型列表
         fetchTypes();
-      } catch (error) {
-        alert('类型删除失败');
+      } catch (error: any) {
+        // 解析错误信息
+        if (error.response?.data?.data === 'type not found') {
+          Message.error(error.response.data.message || '类型不存在');
+        } else {
+          Message.error('类型删除失败');
+        }
         console.error('Error deleting type:', error);
       }
     }
