@@ -565,8 +565,8 @@ const Shops: React.FC = () => {
         visible={isMapSelectorVisible}
         onCancel={() => setIsMapSelectorVisible(false)}
         onConfirm={handleMapSelect}
-        initialLatitude={currentShop.latitude || 39.9042}
-        initialLongitude={currentShop.longitude || 116.4074}
+        initialLatitude={currentShop.latitude || 31.961087}
+        initialLongitude={currentShop.longitude || 118.881044}
       />
     </div>
   );
