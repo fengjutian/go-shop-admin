@@ -173,7 +173,11 @@ const Map: React.FC = () => {
     if (markersRef.current.length > 0) {
       console.log('清除旧标记...');
       markersRef.current.forEach(marker => {
-        marker.setMap(null);
+        try {
+          marker.setMap(null);
+        } catch (error) {
+          console.error('清除标记失败:', error);
+        }
       });
       markersRef.current = [];
     }
@@ -254,16 +258,26 @@ const Map: React.FC = () => {
             bounds.extend(position);
           });
           console.log('计算的边界:', bounds);
-          mapInstance.current.setBounds(bounds, true);
+          // 添加边距，使地图显示更加合理
+          mapInstance.current.setBounds(bounds, true, [50, 50, 50, 50]);
           console.log('地图视野调整完成');
         } catch (error) {
           console.error('调整地图视野失败:', error);
+          // 如果调整视野失败，使用默认中心点
+          mapInstance.current.setCenter([118.820778, 31.931948]);
+          mapInstance.current.setZoom(14);
         }
       } else {
         console.log('没有标记，使用默认视野');
+        // 没有标记时，明确设置默认中心点和缩放级别
+        mapInstance.current.setCenter([118.820778, 31.931948]);
+        mapInstance.current.setZoom(14);
       }
     } else {
       console.log('没有店铺数据或数据正在加载');
+      // 数据加载中或无数据时，使用默认中心点
+      mapInstance.current.setCenter([118.820778, 31.931948]);
+      mapInstance.current.setZoom(14);
     }
   };
 
