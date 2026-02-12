@@ -84,6 +84,8 @@ const Map: React.FC = () => {
 
   // 初始化地图
   useEffect(() => {
+    let isMounted = true;
+    
     // 确保地图容器存在
     if (!mapRef.current) {
       console.error('地图容器不存在');
@@ -99,6 +101,8 @@ const Map: React.FC = () => {
       plugins: ['AMap.ToolBar', 'AMap.Scale', 'AMap.InfoWindow'],
     })
       .then((AMap: any) => {
+        if (!isMounted) return;
+        
         try {
           console.log('地图API加载成功，创建地图实例...');
           // 创建地图实例
@@ -129,12 +133,18 @@ const Map: React.FC = () => {
       });
 
     return () => {
+      isMounted = false;
       console.log('组件卸载，清理地图资源...');
+      
       // 清除标记
       if (markersRef.current.length > 0) {
         console.log('清除旧标记...');
         markersRef.current.forEach(marker => {
-          marker.setMap(null);
+          try {
+            marker.setMap(null);
+          } catch (error) {
+            console.error('清除标记失败:', error);
+          }
         });
         markersRef.current = [];
       }
@@ -148,8 +158,7 @@ const Map: React.FC = () => {
           console.error('销毁地图实例失败:', error);
         }
         mapInstance.current = null;
-        setMapInitialized(false);
-        setAmapInstance(null);
+        // 避免在清理函数中设置状态，可能导致React警告
       }
     };
   }, []); // 只在组件挂载时初始化一次
@@ -260,19 +269,25 @@ const Map: React.FC = () => {
 
   // 当店铺数据变化时更新标记
   useEffect(() => {
-    if (mapInitialized && amapInstance) {
+    let isMounted = true;
+    
+    if (isMounted && mapInitialized && amapInstance) {
       console.log('店铺数据变化，更新标记...');
       console.log('地图初始化状态:', mapInitialized);
       console.log('AMap实例是否存在:', !!amapInstance);
       console.log('地图实例是否存在:', !!mapInstance.current);
       addShopMarkers(amapInstance);
-    } else if (!mapInitialized) {
+    } else if (isMounted && !mapInitialized) {
       console.log('地图未初始化，等待初始化完成后添加标记...');
-    } else if (!amapInstance) {
+    } else if (isMounted && !amapInstance) {
       console.log('AMap实例不存在，等待加载完成后添加标记...');
-    } else if (!mapInstance.current) {
+    } else if (isMounted && !mapInstance.current) {
       console.log('地图实例不存在，等待初始化完成后添加标记...');
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [shops, loading, mapInitialized, amapInstance]); // 当店铺数据、加载状态或地图初始化状态变化时更新标记
 
   return (
