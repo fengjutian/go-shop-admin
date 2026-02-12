@@ -83,7 +83,7 @@ func (r *typeRepository) Get(id uint) (*model.ShopType, error) {
 // List 获取类型列表
 func (r *typeRepository) List() ([]*model.ShopType, error) {
 	var types []*model.ShopType
-	if err := r.db.Find(&types).Error; err != nil {
+	if err := r.db.Order("created_at DESC").Find(&types).Error; err != nil {
 		return nil, err
 	}
 	return types, nil

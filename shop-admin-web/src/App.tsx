@@ -9,6 +9,7 @@ import Products from './pages/Products'
 import Reviews from './pages/Reviews'
 import Users from './pages/Users'
 import Settings from './pages/Settings'
+import Map from './pages/Map'
 
 // 主内容组件，包含路由和页面切换
 const MainContent: React.FC<{ sidebarCollapsed: boolean }> = ({ sidebarCollapsed }) => {
@@ -32,6 +33,7 @@ const MainContent: React.FC<{ sidebarCollapsed: boolean }> = ({ sidebarCollapsed
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/shops" element={<Shops />} />
+          <Route path="/map" element={<Map />} />
           <Route path="/types" element={<Types />} />
           <Route path="/products" element={<Products />} />
           <Route path="/reviews" element={<Reviews />} />
@@ -48,6 +50,7 @@ const SidebarWithRoutes: React.FC<{ collapsed: boolean; onToggle: () => void }> 
   const menuItems = [
     { id: 'dashboard', name: '仪表盘', icon: '📊', path: '/dashboard' },
     { id: 'shops', name: '店铺管理', icon: '🏪', path: '/shops' },
+    { id: 'map', name: '商铺地图显示', icon: '🗺️', path: '/map' },
     { id: 'types', name: '类型管理', icon: '📦', path: '/types' },
     { id: 'products', name: '商品管理', icon: '🛍️', path: '/products' },
     { id: 'reviews', name: '评价管理', icon: '⭐', path: '/reviews' },
