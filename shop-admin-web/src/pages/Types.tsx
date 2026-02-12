@@ -207,7 +207,7 @@ const Types: React.FC = () => {
         title="新增类型"
         visible={isAddModalOpen}
         onCancel={() => setIsAddModalOpen(false)}
-        onOk={handleAddType}
+        onOk={() => { handleAddType(); }}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
         width={500}
@@ -235,7 +235,7 @@ const Types: React.FC = () => {
         title="编辑类型"
         visible={isEditModalOpen}
         onCancel={() => setIsEditModalOpen(false)}
-        onOk={handleEditType}
+        onOk={() => { handleEditType(); }}
         okButtonProps={{ type: 'primary' }}
         cancelButtonProps={{}}
         width={500}

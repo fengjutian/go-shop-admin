@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Pagination, Table, Tag, Tooltip, Typography, Modal, Form, Input, Select, Button, Rating, Row, Col, Toast } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete } from '@douyinfe/semi-icons';
-import { shopApi } from '../services/api';
+import { shopApi, typeApi } from '../services/api';
 import MapSelector from '../components/MapSelector';
 
 const { Text } = Typography;
 
-type TypeList = 'retail' | 'restaurant' | 'service' | 'other';
+type TypeList = any;
 
 interface Shop {
   id?: string | number;
@@ -53,6 +53,7 @@ const Shops: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [isMapSelectorVisible, setIsMapSelectorVisible] = useState(false);
+  const [typeList, setTypeList] = useState<Array<{ value: string; label: string }>>([]);
 
   // 获取店铺列表
   const fetchShops = async () => {
@@ -72,9 +73,25 @@ const Shops: React.FC = () => {
     }
   };
 
+  // 获取类型列表
+  const fetchTypes = async () => {
+    try {
+      const response = await typeApi.getTypes(1, 100); // 获取所有类型
+      const typesData = response.data.data || [];
+      const types = typesData.map((type: any) => ({
+        value: type.name, // 使用类型名称作为值
+        label: type.name  // 使用类型名称作为标签
+      }));
+      setTypeList(types);
+    } catch (error) {
+      console.error('Error fetching types:', error);
+    }
+  };
+
   // 初始加载和分页参数变化时重新获取数据
   useEffect(() => {
     fetchShops();
+    fetchTypes();
   }, [currentPage, pageSize]);
 
   // 处理新增店铺
@@ -214,10 +231,11 @@ const Shops: React.FC = () => {
             onChange={(e) => setTypeFilter(e.target.value)}
           >
             <option value="all">全部类型</option>
-            <option value="retail">零售</option>
-            <option value="restaurant">餐饮</option>
-            <option value="service">服务</option>
-            <option value="other">其他</option>
+            {typeList.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -275,14 +293,19 @@ const Shops: React.FC = () => {
                 title: '类型',
                 dataIndex: 'type',
                 render: (text) => {
-                  const typeConfig = {
-                    retail: { color: 'blue', text: '零售' },
-                    restaurant: { color: 'green', text: '餐饮' },
-                    service: { color: 'orange', text: '服务' },
-                    other: { color: 'purple', text: '其他' },
+                  // 为动态类型生成随机颜色
+                  const getTypeColor = (typeName: string) => {
+                    const colors = ['blue', 'green', 'orange', 'purple', 'red', 'cyan', 'magenta', 'yellow'];
+                    let hash = 0;
+                    for (let i = 0; i < typeName.length; i++) {
+                      hash = typeName.charCodeAt(i) + ((hash << 5) - hash);
+                    }
+                    const index = Math.abs(hash) % colors.length;
+                    return colors[index];
                   };
-                  const typeProps = typeConfig[text] || { color: 'grey', text: '其他' };
-                  return <Tag {...typeProps}>{typeProps.text}</Tag>;
+                  
+                  const color = getTypeColor(text);
+                  return <Tag color={color}>{text}</Tag>;
                 },
               },
               {
@@ -383,10 +406,11 @@ const Shops: React.FC = () => {
             field="type"
             label="类型"
           >
-            <Select.Option value="retail">零售</Select.Option>
-            <Select.Option value="restaurant">餐饮</Select.Option>
-            <Select.Option value="service">服务</Select.Option>
-            <Select.Option value="other">其他</Select.Option>
+            {typeList.map((type) => (
+              <Select.Option key={type.value} value={type.value}>
+                {type.label}
+              </Select.Option>
+            ))}
           </Form.Select>
           <Form.Input
             field="contact"
@@ -473,10 +497,11 @@ const Shops: React.FC = () => {
             field="type"
             label="类型"
           >
-            <Select.Option value="retail">零售</Select.Option>
-            <Select.Option value="restaurant">餐饮</Select.Option>
-            <Select.Option value="service">服务</Select.Option>
-            <Select.Option value="other">其他</Select.Option>
+            {typeList.map((type) => (
+              <Select.Option key={type.value} value={type.value}>
+                {type.label}
+              </Select.Option>
+            ))}
           </Form.Select>
           <Form.Input
             field="contact"
