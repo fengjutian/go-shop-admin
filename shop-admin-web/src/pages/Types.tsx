@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Tag, Tooltip, Pagination } from '@douyinfe/semi-ui';
+import { Table, Button, Modal, Form, Tag, Tooltip,Toast , Pagination } from '@douyinfe/semi-ui';
 import { IconEdit, IconDelete, IconPlus } from '@douyinfe/semi-icons';
 import { typeApi } from '../services/api';
 
@@ -41,13 +41,15 @@ const Types: React.FC = () => {
   // 新增类型
   const handleAddType = async () => {
     if (!currentType.name) {
-      alert('类型名称不能为空');
+      Toast.error('类型名称不能为空');
       return;
     }
 
     try {
       await typeApi.createType(currentType);
-      alert('类型添加成功');
+      // alert('类型添加成功');
+      Toast.success('类型添加成功');
+
       // 重置表单数据
       setCurrentType({ name: '', description: '' });
       setIsAddModalOpen(false);
