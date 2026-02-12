@@ -30,16 +30,48 @@ const Map: React.FC = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [amapInstance, setAmapInstance] = useState<any>(null);
 
-  // 获取店铺列表
+  // 获取店铺数据
   const fetchShops = async () => {
     try {
-      const response = await shopApi.getShops(1, 100000); // 获取所有店铺
-      const shopsData = response.data;
+      console.log('开始获取店铺数据...');
+      // 尝试获取所有店铺，使用更大的pageSize
+      const shopsData = await shopApi.getShops(1, 100000); // 获取所有店铺
+      console.log('API响应数据:', shopsData);
+      
+      // 检查响应结构
+      if (!shopsData) {
+        console.error('API响应数据为空:', shopsData);
+        setShops([]);
+        return;
+      }
+      
+      // 检查data字段
+      if (!shopsData.data) {
+        console.error('店铺数据中没有data字段:', shopsData);
+        setShops([]);
+        return;
+      }
+      
       const shopsList = Array.isArray(shopsData.data) ? shopsData.data : [];
+      console.log('处理后的店铺列表:', shopsList);
+      console.log('店铺数量:', shopsList.length);
+      
+      // 过滤出有经纬度的店铺
+      const shopsWithCoords = shopsList.filter((shop: Shop) => 
+        shop.latitude && shop.longitude
+      );
+      console.log('有经纬度的店铺数量:', shopsWithCoords.length);
+      
+      // 打印有经纬度的店铺
+      console.log('有经纬度的店铺:', shopsWithCoords);
+      
       setShops(shopsList);
     } catch (error) {
       console.error('Error fetching shops:', error);
+      setShops([]);
     } finally {
       setLoading(false);
     }
@@ -50,100 +82,198 @@ const Map: React.FC = () => {
     fetchShops();
   }, []);
 
-  // 渲染地图和标记
+  // 初始化地图
   useEffect(() => {
-    if (mapRef.current) {
-      AMapLoader.load({
-        key: '5131350db8ad49230fd4c7f3cab4f1d8', // 请替换为您的高德地图API密钥
-        version: '2.0',
-        plugins: ['AMap.ToolBar', 'AMap.Scale', 'AMap.InfoWindow'],
-      })
-        .then((AMap: any) => {
+    // 确保地图容器存在
+    if (!mapRef.current) {
+      console.error('地图容器不存在');
+      return;
+    }
+
+    console.log('开始初始化地图...');
+
+    // 加载地图API
+    AMapLoader.load({
+      key: '5131350db8ad49230fd4c7f3cab4f1d8', // 请替换为您的高德地图API密钥
+      version: '2.0',
+      plugins: ['AMap.ToolBar', 'AMap.Scale', 'AMap.InfoWindow'],
+    })
+      .then((AMap: any) => {
+        try {
+          console.log('地图API加载成功，创建地图实例...');
           // 创建地图实例
           mapInstance.current = new AMap.Map(mapRef.current, {
             viewMode: '3D',
-            zoom: 13,
+            zoom: 14,
             center: [118.820778, 31.931948], // 默认中心点
           });
+
+          // 保存地图实例和AMap对象
+          setAmapInstance(AMap);
+          setMapInitialized(true);
 
           // 添加工具条和比例尺
           mapInstance.current.addControl(new AMap.ToolBar());
           mapInstance.current.addControl(new AMap.Scale());
 
-          // 清除旧标记
-          if (markersRef.current.length > 0) {
-            markersRef.current.forEach(marker => {
-              marker.setMap(null);
-            });
-            markersRef.current = [];
-          }
-
-          // 添加店铺标记
-          if (!loading && shops.length > 0) {
-            shops.forEach(shop => {
-              if (shop.latitude && shop.longitude) {
-                // 创建标记
-                const marker = new AMap.Marker({
-                  position: [shop.longitude, shop.latitude],
-                  title: shop.name,
-                  icon: new AMap.Icon({
-                    size: new AMap.Size(32, 32),
-                    image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
-                    imageSize: new AMap.Size(32, 32),
-                  }),
-                });
-
-                // 添加标记到地图
-                marker.setMap(mapInstance.current);
-                markersRef.current.push(marker);
-
-                // 创建信息窗口
-                const infoWindow = new AMap.InfoWindow({
-                  content: `
-                    <div style="padding: 10px;">
-                      <h3 style="margin: 0 0 10px 0;">${shop.name}</h3>
-                      <p style="margin: 5px 0;">地址: ${shop.address || '-'}</p>
-                      <p style="margin: 5px 0;">类型: ${shop.type || '-'}</p>
-                      <p style="margin: 5px 0;">联系方式: ${shop.contact || '-'}</p>
-                      <p style="margin: 5px 0;">评分: ${shop.rating || '-'}</p>
-                    </div>
-                  `,
-                  size: new AMap.Size(300, 0),
-                  autoMove: true,
-                  closeWhenClickMap: true,
-                });
-
-                // 监听标记点击事件
-                marker.on('click', () => {
-                  infoWindow.open(mapInstance.current, marker.getPosition());
-                  setSelectedShop(shop);
-                });
-              }
-            });
-
-            // 调整地图视野以显示所有标记
-            if (markersRef.current.length > 0) {
-              const bounds = new AMap.Bounds();
-              markersRef.current.forEach(marker => {
-                bounds.extend(marker.getPosition());
-              });
-              mapInstance.current.setBounds(bounds, true);
-            }
-          }
-        })
-        .catch((e: any) => {
-          console.error('地图加载失败:', e);
-        });
-    }
+          console.log('地图初始化完成');
+          
+          // 初始化后添加标记
+          addShopMarkers(AMap);
+        } catch (error) {
+          console.error('创建地图实例失败:', error);
+        }
+      })
+      .catch((e: any) => {
+        console.error('地图加载失败:', e);
+      });
 
     return () => {
+      console.log('组件卸载，清理地图资源...');
+      // 清除标记
+      if (markersRef.current.length > 0) {
+        console.log('清除旧标记...');
+        markersRef.current.forEach(marker => {
+          marker.setMap(null);
+        });
+        markersRef.current = [];
+      }
+      
       // 销毁地图实例
       if (mapInstance.current) {
-        mapInstance.current.destroy();
+        try {
+          mapInstance.current.destroy();
+          console.log('地图实例销毁成功');
+        } catch (error) {
+          console.error('销毁地图实例失败:', error);
+        }
         mapInstance.current = null;
+        setMapInitialized(false);
+        setAmapInstance(null);
       }
     };
-  }, [shops, loading]);
+  }, []); // 只在组件挂载时初始化一次
+
+  // 添加店铺标记
+  const addShopMarkers = (AMap: any) => {
+    console.log('开始添加店铺标记...');
+    console.log('店铺列表长度:', shops.length);
+    console.log('地图实例是否存在:', !!mapInstance.current);
+    
+    // 清除旧标记
+    if (markersRef.current.length > 0) {
+      console.log('清除旧标记...');
+      markersRef.current.forEach(marker => {
+        marker.setMap(null);
+      });
+      markersRef.current = [];
+    }
+    
+    if (!mapInstance.current) {
+      console.error('地图实例不存在，无法添加标记');
+      return;
+    }
+    
+    if (!loading && shops.length > 0) {
+      let addedMarkers = 0;
+      
+      console.log('处理店铺数据...');
+      shops.forEach((shop: Shop, index: number) => {
+        console.log(`处理店铺 ${index + 1}:`, shop.name);
+        console.log(`店铺经纬度: ${shop.longitude}, ${shop.latitude}`);
+        
+        if (shop.latitude && shop.longitude) {
+          try {
+            // 创建标记
+            const marker = new AMap.Marker({
+              position: [shop.longitude, shop.latitude],
+              title: shop.name,
+              icon: new AMap.Icon({
+                size: new AMap.Size(32, 32),
+                image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+                imageSize: new AMap.Size(32, 32),
+              }),
+            });
+
+            // 添加标记到地图
+            marker.setMap(mapInstance.current);
+            markersRef.current.push(marker);
+            addedMarkers++;
+            
+            console.log(`成功添加标记: ${shop.name}`);
+
+            // 创建信息窗口
+            const infoWindow = new AMap.InfoWindow({
+              content: `
+                <div style="padding: 10px;">
+                  <h3 style="margin: 0 0 10px 0;">${shop.name}</h3>
+                  <p style="margin: 5px 0;">地址: ${shop.address || '-'}</p>
+                  <p style="margin: 5px 0;">类型: ${shop.type || '-'}</p>
+                  <p style="margin: 5px 0;">联系方式: ${shop.contact || '-'}</p>
+                  <p style="margin: 5px 0;">评分: ${shop.rating || '-'}</p>
+                </div>
+              `,
+              size: new AMap.Size(300, 0),
+              autoMove: true,
+              closeWhenClickMap: true,
+            });
+
+            // 监听标记点击事件
+            marker.on('click', () => {
+              infoWindow.open(mapInstance.current, marker.getPosition());
+              setSelectedShop(shop);
+            });
+          } catch (error) {
+            console.error(`添加标记失败: ${shop.name}`, error);
+          }
+        } else {
+          console.log(`跳过无经纬度的店铺: ${shop.name}`);
+        }
+      });
+
+      console.log(`总共添加了 ${addedMarkers} 个标记`);
+      console.log(`标记数组长度: ${markersRef.current.length}`);
+
+      // 调整地图视野以显示所有标记
+      if (markersRef.current.length > 0) {
+        console.log('开始调整地图视野...');
+        try {
+          const bounds = new AMap.Bounds();
+          markersRef.current.forEach((marker, index) => {
+            const position = marker.getPosition();
+            console.log(`标记 ${index + 1} 位置:`, position);
+            bounds.extend(position);
+          });
+          console.log('计算的边界:', bounds);
+          mapInstance.current.setBounds(bounds, true);
+          console.log('地图视野调整完成');
+        } catch (error) {
+          console.error('调整地图视野失败:', error);
+        }
+      } else {
+        console.log('没有标记，使用默认视野');
+      }
+    } else {
+      console.log('没有店铺数据或数据正在加载');
+    }
+  };
+
+  // 当店铺数据变化时更新标记
+  useEffect(() => {
+    if (mapInitialized && amapInstance) {
+      console.log('店铺数据变化，更新标记...');
+      console.log('地图初始化状态:', mapInitialized);
+      console.log('AMap实例是否存在:', !!amapInstance);
+      console.log('地图实例是否存在:', !!mapInstance.current);
+      addShopMarkers(amapInstance);
+    } else if (!mapInitialized) {
+      console.log('地图未初始化，等待初始化完成后添加标记...');
+    } else if (!amapInstance) {
+      console.log('AMap实例不存在，等待加载完成后添加标记...');
+    } else if (!mapInstance.current) {
+      console.log('地图实例不存在，等待初始化完成后添加标记...');
+    }
+  }, [shops, loading, mapInitialized, amapInstance]); // 当店铺数据、加载状态或地图初始化状态变化时更新标记
 
   return (
     <div className="map-page" style={{ padding: 20 }}>
