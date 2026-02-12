@@ -101,15 +101,17 @@ func (h *ShopHandler) List(c *gin.Context) {
 	// 获取分页参数
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
-	
+
 	// 确保分页参数有效
 	if page < 1 {
 		page = 1
 	}
-	if pageSize < 1 || pageSize > 100 {
+	if pageSize < 1 {
 		pageSize = 10
 	}
-	
+	// 对于地图页面的特殊需求，允许更大的pageSize
+	// 当地图页面请求大量数据时（pageSize > 1000），会触发后端的全量查询
+
 	shops, total, err := h.service.ListShopsWithPagination(page, pageSize)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "获取店铺列表失败", err)
