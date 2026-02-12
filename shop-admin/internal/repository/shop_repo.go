@@ -75,32 +75,35 @@ func (r *shopRepository) ListWithPagination(page, pageSize int) ([]*model.Shop, 
 	var shops []*model.Shop
 	var total int64
 
-	// 计算偏移量
-	offset := (page - 1) * pageSize
-
 	// 获取总记录数
 	if err := r.db.Model(&model.Shop{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// 按创建时间倒序排序
-	// if err := r.db.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&shops).Error; err != nil {
-	// 	return nil, 0, err
-	// }
+	// 当pageSize很大时，直接获取所有数据，不使用分页限制
+	// 避免数据库或驱动对Limit的大小限制
+	if pageSize > 1000 {
+		// 直接获取所有数据，按创建时间倒序排序
+		if err := r.db.
+			Model(&model.Shop{}).
+			Order("created_at DESC").
+			Find(&shops).Error; err != nil {
+			return nil, 0, err
+		}
+	} else {
+		// 计算偏移量
+		offset := (page - 1) * pageSize
 
-	if err := r.db.
-		Model(&model.Shop{}).
-		Order("created_at DESC").
-		Limit(pageSize).
-		Offset(offset).
-		Find(&shops).Error; err != nil {
-		return nil, 0, err
+		// 按创建时间倒序排序，使用分页
+		if err := r.db.
+			Model(&model.Shop{}).
+			Order("created_at DESC").
+			Limit(pageSize).
+			Offset(offset).
+			Find(&shops).Error; err != nil {
+			return nil, 0, err
+		}
 	}
-
-	// 方法2：使用原生SQL
-	// if err := r.db.Raw("SELECT * FROM shops ORDER BY created_at DESC LIMIT ? OFFSET ?", pageSize, offset).Scan(&shops).Error; err != nil {
-	// 	return nil, 0, err
-	// }
 
 	return shops, total, nil
 }
