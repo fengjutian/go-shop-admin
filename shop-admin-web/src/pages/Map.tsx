@@ -291,15 +291,14 @@ const Map: React.FC = () => {
   }, [shops, loading, mapInitialized, amapInstance]); // 当店铺数据、加载状态或地图初始化状态变化时更新标记
 
   return (
-    <div className="map-page" style={{ padding: 20 }}>
-      <Title level={2}>商铺地图显示</Title>
+    <div className="map-page" style={{ padding: 0 }}>
       
-      <Card style={{ marginBottom: 20 }}>
+      <Card style={{ marginBottom: 0 }}>
         <div 
           ref={mapRef} 
           style={{ 
             width: '100%', 
-            height: 600, 
+            height: '650px', 
             position: 'relative',
             overflow: 'hidden'
           }}
