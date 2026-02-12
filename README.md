@@ -1,63 +1,72 @@
-# Shop Admin API
+# 电商后台管理系统
 
-Shop Admin API 是一个基于 Go 语言开发的电商后台管理系统 API。
+电商后台管理系统是一个基于 Go 语言和 React 开发的完整电商后台解决方案，包含后端 API 和前端管理界面。
 
 ## 功能特性
 
-- 店铺管理：创建、更新、删除、查询店铺信息
+### 后端功能
+- 店铺管理：创建、更新、删除、查询店铺信息，支持分页查询
 - 商品管理：创建、更新、删除、查询商品信息，支持按店铺查询商品
 - 评价管理：创建、更新、删除、查询评价信息，支持按商品查询评价
+- 类型管理：管理店铺类型，支持按创建时间倒序查询
+
+### 前端功能
+- 店铺管理：可视化管理店铺信息，支持增删改查
+- 商品管理：商品信息的管理和展示
+- 评价管理：评价信息的查看和管理
+- 类型管理：店铺类型的管理
+- 地图展示：在高德地图上展示店铺位置，支持按类型显示不同颜色标记
 
 ## 技术栈
 
+### 后端
 - Go 1.20
 - Gin 框架
 - GORM 框架
 - MySQL 数据库
 
+### 前端
+- React 18
+- TypeScript
+- Semi UI 组件库
+- Axios
+- 高德地图 API
+
 ## 目录结构
 
 ```
 go-shop-admin/
- ├── shop-admin/
+ ├── shop-admin/           # 后端 API 项目
  │   ├── cmd/
  │   │   └── admin/
- │   │       └── main.go
+ │   │       └── main.go    # 后端入口文件
  │   ├── config/
- │   │   ├── config.yaml
- │   │   └── config.go
+ │   │   ├── config.yaml    # 配置文件
+ │   │   └── config.go      # 配置加载
  │   ├── internal/
  │   │   ├── api/
- │   │   │   └── v1/
- │   │   │       ├── shop_handler.go
- │   │   │       ├── product_handler.go
- │   │   │       └── review_handler.go
- │   │   ├── service/
- │   │   │   ├── shop_service.go
- │   │   │   ├── product_service.go
- │   │   │   └── review_service.go
- │   │   ├── repository/
- │   │   │   ├── shop_repo.go
- │   │   │   ├── product_repo.go
- │   │   │   └── review_repo.go
- │   │   ├── model/
- │   │   │   ├── shop.go
- │   │   │   ├── product.go
- │   │   │   └── review.go
- │   │   └── router/
- │   │       └── router.go
+ │   │   │   └── v1/        # API 处理器
+ │   │   ├── service/       # 业务逻辑层
+ │   │   ├── repository/    # 数据访问层
+ │   │   ├── model/         # 数据模型
+ │   │   └── router/        # 路由配置
  │   ├── pkg/
- │   │   ├── db/
- │   │   │   └── mysql.go
- │   │   └── response/
- │   │       └── response.go
- │   ├── migrations/
- │   │   ├── 001_create_shop.sql
- │   │   ├── 002_create_product.sql
- │   │   └── 003_create_review.sql
- │   ├── go.mod
- │   └── README.md
- └── README.md
+ │   │   ├── db/            # 数据库连接
+ │   │   └── response/      # 响应处理
+ │   ├── migrations/        # 数据库迁移文件
+ │   ├── go.mod             # Go 模块文件
+ │   └── README.md          # 后端说明文档
+ ├── shop-admin-web/        # 前端管理界面
+ │   ├── public/            # 静态资源
+ │   ├── src/
+ │   │   ├── components/    # 公共组件
+ │   │   ├── pages/         # 页面组件
+ │   │   ├── services/      # API 服务
+ │   │   ├── App.tsx        # 应用入口
+ │   │   └── main.tsx       # 渲染入口
+ │   ├── package.json       # 前端依赖
+ │   └── README.md          # 前端说明文档
+ └── README.md              # 项目总说明文档
 ```
 
 ## 快速开始
@@ -90,20 +99,25 @@ database:
   dsn: "root:your_password@tcp(localhost:3306)/shop_admin?charset=utf8mb4&parseTime=True&loc=Local"
 ```
 
-### 3. 安装依赖
+### 3. 启动后端服务
 
 ```bash
 cd shop-admin
 go mod tidy
-```
-
-### 4. 启动服务
-
-```bash
 go run ./cmd/admin
 ```
 
-服务将在 `http://localhost:8080` 启动。
+后端服务将在 `http://localhost:8080` 启动。
+
+### 4. 启动前端服务
+
+```bash
+cd ../shop-admin-web
+npm install
+npm run dev
+```
+
+前端服务将在 `http://localhost:3000` 启动。
 
 ## API 文档
 
@@ -115,7 +129,7 @@ go run ./cmd/admin
 | PUT | /api/v1/shops/:id | 更新店铺 |
 | DELETE | /api/v1/shops/:id | 删除店铺 |
 | GET | /api/v1/shops/:id | 获取店铺详情 |
-| GET | /api/v1/shops | 获取店铺列表 |
+| GET | /api/v1/shops | 获取店铺列表（支持分页） |
 
 ### 商品 API
 
@@ -139,6 +153,16 @@ go run ./cmd/admin
 | GET | /api/v1/reviews | 获取评价列表 |
 | GET | /api/v1/reviews/product/:product_id | 根据商品ID获取评价列表 |
 
+### 类型 API
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| POST | /api/v1/types | 创建类型 |
+| PUT | /api/v1/types/:id | 更新类型 |
+| DELETE | /api/v1/types/:id | 删除类型 |
+| GET | /api/v1/types/:id | 获取类型详情 |
+| GET | /api/v1/types | 获取类型列表（按创建时间倒序） |
+
 ## 数据库设计
 
 ### 1. 店铺表 (shops)
@@ -147,8 +171,15 @@ go run ./cmd/admin
 |--------|----------|------|------|
 | id | bigint(20) unsigned | PRIMARY KEY, AUTO_INCREMENT | 店铺ID |
 | name | varchar(255) | NOT NULL | 店铺名称 |
+| email | varchar(255) | NOT NULL | 店铺邮箱 |
 | address | varchar(255) | | 店铺地址 |
-| phone | varchar(20) | | 店铺电话 |
+| type | varchar(50) | | 店铺类型 |
+| contact | varchar(50) | | 联系人 |
+| phone | varchar(20) | | 联系电话 |
+| latitude | decimal(10,6) | | 纬度 |
+| longitude | decimal(10,6) | | 经度 |
+| rating | decimal(2,1) | | 评分 |
+| description | text | | 店铺描述 |
 | created_at | timestamp | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 | updated_at | timestamp | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
 
@@ -175,28 +206,50 @@ go run ./cmd/admin
 | created_at | timestamp | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 | updated_at | timestamp | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
 
+### 4. 类型表 (types)
+
+| 字段名 | 数据类型 | 约束 | 描述 |
+|--------|----------|------|------|
+| id | bigint(20) unsigned | PRIMARY KEY, AUTO_INCREMENT | 类型ID |
+| name | varchar(50) | NOT NULL | 类型名称 |
+| created_at | timestamp | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+| updated_at | timestamp | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
+
 ## 部署说明
 
-### 1. 编译项目
+### 后端部署
+
+1. 编译项目：
 
 ```bash
 cd shop-admin
 go build -o shop-admin ./cmd/admin
 ```
 
-### 2. 运行项目
+2. 运行项目：
 
 ```bash
 ./shop-admin
 ```
 
-### 3. 配置环境变量
-
-可以通过环境变量覆盖配置文件中的设置：
+3. 配置环境变量：
 
 ```bash
 SHOP_ADMIN_PORT=8080 SHOP_ADMIN_DSN="root:password@tcp(localhost:3306)/shop_admin?charset=utf8mb4&parseTime=True&loc=Local" ./shop-admin
 ```
+
+### 前端部署
+
+1. 构建项目：
+
+```bash
+cd shop-admin-web
+npm run build
+```
+
+2. 部署构建产物：
+
+将 `build` 目录下的文件部署到静态文件服务器或 CDN。
 
 ## 贡献指南
 
